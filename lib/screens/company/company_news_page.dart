@@ -5,17 +5,17 @@ import 'package:two_value/src/helper_widgets.dart';
 
 import 'company_single_press_view.dart';
 
-class CompanyHomeView extends StatefulWidget {
+class CompanyNewsPage extends StatefulWidget {
   final String userId;
   final DocumentSnapshot userData;
-  const CompanyHomeView(
+  const CompanyNewsPage(
       {super.key, required this.userId, required this.userData});
 
   @override
-  State<CompanyHomeView> createState() => _CompanyHomeViewState();
+  State<CompanyNewsPage> createState() => _CompanyNewsPageState();
 }
 
-class _CompanyHomeViewState extends State<CompanyHomeView> {
+class _CompanyNewsPageState extends State<CompanyNewsPage> {
   String language = '';
 
   @override
@@ -41,7 +41,8 @@ class _CompanyHomeViewState extends State<CompanyHomeView> {
               Row(
                 children: [
                   blueBodyTextLarge(
-                      language == 'ro' ? 'ACTIVITATE' : 'ACTIVITY'),
+                    language == 'ro' ? 'ȘTIRI' : 'NEWS',
+                  ),
                 ],
               ),
               addVerticalSpace(20),
@@ -50,7 +51,7 @@ class _CompanyHomeViewState extends State<CompanyHomeView> {
                     .collection('XArticles')
                     .doc('Presses')
                     .collection('Dominant')
-                    .where('press_poster', isEqualTo: widget.userId)
+                    .where('press_status', isEqualTo: 'LIVE')
                     .orderBy('press_time', descending: true)
                     .limit(10)
                     .snapshots(),
@@ -99,7 +100,7 @@ class _CompanyHomeViewState extends State<CompanyHomeView> {
                                 ),
                               );
                             },
-                            child: pressItem(doc),
+                            child: pressPublicItem(doc),
                           );
                         },
                       );

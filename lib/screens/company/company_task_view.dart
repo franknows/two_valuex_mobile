@@ -5,17 +5,17 @@ import 'package:two_value/src/helper_widgets.dart';
 
 import 'company_single_press_view.dart';
 
-class CompanyHomeView extends StatefulWidget {
+class CompanyTaskView extends StatefulWidget {
   final String userId;
   final DocumentSnapshot userData;
-  const CompanyHomeView(
+  const CompanyTaskView(
       {super.key, required this.userId, required this.userData});
 
   @override
-  State<CompanyHomeView> createState() => _CompanyHomeViewState();
+  State<CompanyTaskView> createState() => _CompanyTaskViewState();
 }
 
-class _CompanyHomeViewState extends State<CompanyHomeView> {
+class _CompanyTaskViewState extends State<CompanyTaskView> {
   String language = '';
 
   @override
@@ -51,6 +51,7 @@ class _CompanyHomeViewState extends State<CompanyHomeView> {
                     .doc('Presses')
                     .collection('Dominant')
                     .where('press_poster', isEqualTo: widget.userId)
+                    .where('press_status', isEqualTo: '-')
                     .orderBy('press_time', descending: true)
                     .limit(10)
                     .snapshots(),

@@ -1,3 +1,4 @@
+import 'package:awesome_circular_chart/awesome_circular_chart.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/cupertino.dart';
@@ -20,19 +21,44 @@ class CompanyProfilePage extends StatefulWidget {
 
 class _CompanyProfilePageState extends State<CompanyProfilePage> {
   String language = '';
+  DocumentSnapshot? _userData;
+  final GlobalKey<AnimatedCircularChartState> _chartKey =
+      GlobalKey<AnimatedCircularChartState>();
+  int total = 0;
 
   @override
   void initState() {
     // TODO: implement initState
     super.initState();
+    getTotal();
+    setState(() {
+      _userData = widget.userData;
+    });
+    _getUserData(widget.userId);
     setState(() {
       language = widget.userData['user_language'];
     });
   }
 
-  @override
-  void dispose() {
-    super.dispose();
+  void _getUserData(String userId) {
+    FirebaseFirestore.instance
+        .collection('XUsers')
+        .doc(userId)
+        .snapshots()
+        .listen((DocumentSnapshot snapshot) {
+      setState(() {
+        _userData = snapshot;
+      });
+    });
+  }
+
+  getTotal() {
+    setState(() {
+      total = widget.userData['press_left_count'] +
+          widget.userData['interview_left_count'] +
+          widget.userData['interview_left_count'] +
+          20;
+    });
   }
 
   @override
@@ -80,7 +106,7 @@ class _CompanyProfilePageState extends State<CompanyProfilePage> {
                   Stack(
                     children: [
                       const Padding(
-                        padding: EdgeInsets.only(bottom: 48.0),
+                        padding: EdgeInsets.only(bottom: 100.0),
                         child: Image(
                           width: double.infinity,
                           image: AssetImage('assets/images/profile_bg.png'),
@@ -94,75 +120,41 @@ class _CompanyProfilePageState extends State<CompanyProfilePage> {
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            GestureDetector(
-                              onTap: () {
-                                // getImage();
-                              },
-                              child: CircleAvatar(
-                                radius: 48,
-                                backgroundColor: Colors.white,
-                                child: Padding(
-                                  padding: const EdgeInsets.all(3.0),
-                                  child: ClipOval(
-                                    // Wrap with ClipOval to make the image circular
-                                    child: CachedNetworkImage(
-                                      imageUrl: widget.userData['user_image'],
-                                      placeholder: (context, url) =>
-                                          Image.asset(
-                                        'assets/images/vertical_placeholder.png',
-                                        fit: BoxFit.cover,
-                                        width: 90,
-                                        height: 90,
-                                      ),
-                                      errorWidget: (context, url, error) =>
-                                          Image.asset(
-                                        'assets/images/vertical_placeholder.png',
-                                        fit: BoxFit.cover,
-                                        width: 90,
-                                        height: 90,
-                                      ),
-                                      fit: BoxFit.cover,
-                                    ),
-                                  ),
-                                ),
-                              ),
-                            ),
-                            addVerticalSpace(20),
                             Row(
                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               children: [
-                                Flexible(
-                                  child: Column(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                    children: [
-                                      blackBoldTextWithSize(
-                                          widget.userData['user_name'], 18),
-                                      addVerticalSpace(6.0),
-                                      Row(
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.start,
-                                        children: [
-                                          const Icon(
-                                            CupertinoIcons.location_solid,
-                                            size: 14,
+                                GestureDetector(
+                                  onTap: () {
+                                    // getImage();
+                                  },
+                                  child: CircleAvatar(
+                                    radius: 58,
+                                    backgroundColor: Colors.white,
+                                    child: Padding(
+                                      padding: const EdgeInsets.all(3.0),
+                                      child: ClipOval(
+                                        // Wrap with ClipOval to make the image circular
+                                        child: CachedNetworkImage(
+                                          imageUrl:
+                                              widget.userData['user_image'],
+                                          placeholder: (context, url) =>
+                                              Image.asset(
+                                            'assets/images/vertical_placeholder.png',
+                                            fit: BoxFit.cover,
+                                            width: 90,
+                                            height: 90,
                                           ),
-                                          addHorizontalSpace(10),
-                                          Flexible(
-                                            child: blackNormalText(widget
-                                                .userData['user_address']),
-                                          )
-                                        ],
+                                          errorWidget: (context, url, error) =>
+                                              Image.asset(
+                                            'assets/images/vertical_placeholder.png',
+                                            fit: BoxFit.cover,
+                                            width: 90,
+                                            height: 90,
+                                          ),
+                                          fit: BoxFit.cover,
+                                        ),
                                       ),
-                                      addVerticalSpace(10.0),
-                                      blackBoldTextWithSize(
-                                          language == 'ro'
-                                              ? 'Biografie'
-                                              : 'Biography',
-                                          18),
-                                      blackNormalText(
-                                          widget.userData['about_user'])
-                                    ],
+                                    ),
                                   ),
                                 ),
                                 InkWell(
@@ -192,6 +184,16 @@ class _CompanyProfilePageState extends State<CompanyProfilePage> {
                                     ),
                                   ),
                                 ),
+                              ],
+                            ),
+                            addVerticalSpace(10),
+                            Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                blackBoldTextWithSize(
+                                    widget.userData['user_name'], 18),
+                                addVerticalSpace(6.0),
+                                blackBioText(widget.userData['about_user'])
                               ],
                             ),
                           ],
@@ -227,9 +229,11 @@ class _CompanyProfilePageState extends State<CompanyProfilePage> {
                                   blackBoldText(widget
                                       .userData['user_categories'].length
                                       .toString()),
-                                  widget.userData['user_language'] == 'sw'
-                                      ? blackNormalText('Kozi zangu')
-                                      : blackNormalText('My courses'),
+                                  language == 'ro'
+                                      ? blackNormalCenteredText(
+                                          'Comunicate\nde presă')
+                                      : blackNormalCenteredText(
+                                          'Press\nreleases'),
                                 ],
                               ),
                               Container(
@@ -242,9 +246,9 @@ class _CompanyProfilePageState extends State<CompanyProfilePage> {
                                   blackBoldText(widget
                                       .userData['user_categories'].length
                                       .toString()),
-                                  widget.userData['user_language'] == 'sw'
-                                      ? blackNormalText('Makala zangu')
-                                      : blackNormalText('My blogs'),
+                                  language == 'ro'
+                                      ? blackNormalCenteredText('Interviuri')
+                                      : blackNormalCenteredText('Interviews'),
                                 ],
                               ),
                               Container(
@@ -257,9 +261,10 @@ class _CompanyProfilePageState extends State<CompanyProfilePage> {
                                   blackBoldText(widget
                                       .userData['user_categories'].length
                                       .toString()),
-                                  widget.userData['user_language'] == 'sw'
-                                      ? blackNormalText('Bidhaa')
-                                      : blackNormalText('Products'),
+                                  language == 'ro'
+                                      ? blackNormalCenteredText(
+                                          'Evenimente\nde presă')
+                                      : blackNormalCenteredText('Press events'),
                                 ],
                               ),
                             ],
@@ -293,11 +298,11 @@ class _CompanyProfilePageState extends State<CompanyProfilePage> {
                         children: [
                           addVerticalSpace(20),
                           profileTiles(
-                            widget.userData['user_language'] == 'sw'
-                                ? 'Lugha (${widget.userData['user_language']})'
+                            language == 'ro'
+                                ? 'Limba (${widget.userData['user_language']})'
                                 : 'Language (${widget.userData['user_language']})',
-                            widget.userData['user_language'] == 'sw'
-                                ? 'Bonyeza kubadili lugha'
+                            language == 'ro'
+                                ? 'Atingeți pentru a schimba limba'
                                 : 'Tap to change the language',
                           ),
                           const SizedBox(
@@ -315,12 +320,12 @@ class _CompanyProfilePageState extends State<CompanyProfilePage> {
                                         .collection('XUsers')
                                         .doc(widget.userId);
                                     Map<String, dynamic> updateTasks = {
-                                      'user_language': 'sw',
+                                      'user_language': 'ro',
                                     };
                                     ds.update(updateTasks);
                                   },
-                                  child: swToggleBox(
-                                      widget.userData['user_language']),
+                                  child:
+                                      swToggleBox(_userData!['user_language']),
                                 ),
                               ),
                               const SizedBox(
@@ -342,8 +347,8 @@ class _CompanyProfilePageState extends State<CompanyProfilePage> {
                                       ds.update(updateTasks);
                                     });
                                   },
-                                  child: engToggleBox(
-                                      widget.userData['user_language']),
+                                  child:
+                                      engToggleBox(_userData!['user_language']),
                                 ),
                               ),
                             ],
@@ -356,283 +361,85 @@ class _CompanyProfilePageState extends State<CompanyProfilePage> {
                           Row(
                             children: [
                               black54BoldText(
-                                widget.userData['user_language'] == 'sw'
-                                    ? 'Mipangilio ya kiuongozi'
-                                    : 'Admin settings',
+                                language == 'ro'
+                                    ? 'Abonament: ${widget.userData['user_plan'] == '-' ? 'DEMO' : widget.userData['user_plan']}'
+                                    : 'Subscription: ${widget.userData['user_plan'] == '-' ? 'DEMO' : widget.userData['user_plan']}',
                               ),
                             ],
                           ),
-                          GridView(
-                            gridDelegate:
-                                const SliverGridDelegateWithFixedCrossAxisCount(
-                              crossAxisCount: 3,
-                              crossAxisSpacing: 4.0,
-                              mainAxisSpacing: 4.0,
-                              childAspectRatio: 1,
-                            ),
-                            scrollDirection: Axis.vertical,
-                            physics: const NeverScrollableScrollPhysics(),
-                            shrinkWrap: true,
-                            padding: const EdgeInsets.only(top: 10, bottom: 16),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
-                              GestureDetector(
-                                onTap: () {
-                                  // Navigator.push(
-                                  //   context,
-                                  //   CupertinoPageRoute(
-                                  //     builder: (_) => AdminManageUsersPage(
-                                  //       userId: widget.userId,
-                                  //       userData: widget.userData,
-                                  //     ),
-                                  //   ),
-                                  // );
-                                },
-                                child: Card(
-                                  shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(10.0),
-                                  ),
-                                  elevation: 2.0,
-                                  color: Colors.white,
-                                  child: Column(
-                                    mainAxisAlignment: MainAxisAlignment.center,
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.center,
-                                    children: [
-                                      const CircleAvatar(
-                                        radius: 30,
-                                        backgroundColor: Colors.black12,
-                                        child: Icon(
-                                          Icons.people_alt_rounded,
-                                          size: 24,
-                                          color: Colors.black54,
-                                        ),
+                              AnimatedCircularChart(
+                                holeRadius: 30,
+                                key: _chartKey,
+                                size: Size(120, 120),
+                                initialChartData: <CircularStackEntry>[
+                                  CircularStackEntry(
+                                    <CircularSegmentEntry>[
+                                      CircularSegmentEntry(
+                                        (widget.userData[
+                                                    'interview_left_count'] /
+                                                total) *
+                                            100,
+                                        Colors.blue[400],
+                                        rankKey: 'completed',
                                       ),
-                                      addVerticalSpace(10),
-                                      blackBoldText(
-                                        widget.userData['user_language'] == 'sw'
-                                            ? 'Watumiaji'
-                                            : 'XUsers',
+                                      CircularSegmentEntry(
+                                        (widget.userData['event_left_count'] /
+                                                total) *
+                                            100,
+                                        Colors.green[600],
+                                        rankKey: 'remaining',
                                       ),
-                                      addVerticalSpace(2.0),
+                                      CircularSegmentEntry(
+                                        (widget.userData['press_left_count'] /
+                                                total) *
+                                            100,
+                                        Colors.red[600],
+                                        rankKey: 'pending',
+                                      ),
+                                      CircularSegmentEntry(
+                                        (20 / total) * 100,
+                                        Colors.grey[100],
+                                        rankKey: 'empty',
+                                      ),
                                     ],
+                                    rankKey: 'progress',
                                   ),
+                                ],
+                                chartType: CircularChartType.Radial,
+                                percentageValues: true,
+                                holeLabel:
+                                    '${((total - 20) / total * 100).toInt()}%',
+                                labelStyle: TextStyle(
+                                  color: Colors.blueGrey[600],
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 14.0,
                                 ),
                               ),
-                              GestureDetector(
-                                onTap: () {
-                                  // Navigator.push(
-                                  //   context,
-                                  //   CupertinoPageRoute(
-                                  //     builder: (_) => AdminManageCoursesPage(
-                                  //       userId: widget.userId,
-                                  //       userData: widget.userData,
-                                  //     ),
-                                  //   ),
-                                  // );
-                                },
-                                child: Card(
-                                  shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(10.0),
-                                  ),
-                                  elevation: 2.0,
-                                  color: Colors.white,
-                                  child: Column(
-                                    mainAxisAlignment: MainAxisAlignment.center,
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.center,
-                                    children: [
-                                      const CircleAvatar(
-                                        radius: 30,
-                                        backgroundColor: Colors.black12,
-                                        child: Icon(
-                                          CupertinoIcons.film_fill,
-                                          size: 24,
-                                          color: Colors.black54,
-                                        ),
-                                      ),
-                                      addVerticalSpace(10),
-                                      blackBoldText(
-                                        widget.userData['user_language'] == 'sw'
-                                            ? 'Kozi'
-                                            : 'Courses',
-                                      ),
-                                      addVerticalSpace(2.0),
-                                    ],
-                                  ),
+                              addHorizontalSpace(30),
+                              Flexible(
+                                child: Column(
+                                  children: [
+                                    bulletColoredBlackText(
+                                        language == 'ro'
+                                            ? '${widget.userData['press_left_count']} Comunicate de presă'
+                                            : '${widget.userData['press_left_count']} Press releases',
+                                        Colors.red),
+                                    bulletColoredBlackText(
+                                        language == 'ro'
+                                            ? '${widget.userData['interview_left_count']} Interviuri'
+                                            : '${widget.userData['interview_left_count']} Interviews',
+                                        Colors.blue),
+                                    bulletColoredBlackText(
+                                        language == 'ro'
+                                            ? '${widget.userData['event_left_count']} Evenimente de presă'
+                                            : '${widget.userData['event_left_count']} Press events',
+                                        Colors.green),
+                                  ],
                                 ),
-                              ),
-                              GestureDetector(
-                                onTap: () {
-                                  // Navigator.push(
-                                  //   context,
-                                  //   CupertinoPageRoute(
-                                  //     builder: (_) => AdminManageBlogsPage(
-                                  //       userId: widget.userId,
-                                  //       userData: widget.userData,
-                                  //     ),
-                                  //   ),
-                                  // );
-                                },
-                                child: Card(
-                                  shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(10.0),
-                                  ),
-                                  elevation: 2.0,
-                                  color: Colors.white,
-                                  child: Column(
-                                    mainAxisAlignment: MainAxisAlignment.center,
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.center,
-                                    children: [
-                                      const CircleAvatar(
-                                        radius: 30,
-                                        backgroundColor: Colors.black12,
-                                        child: Icon(
-                                          CupertinoIcons.doc_richtext,
-                                          size: 24,
-                                          color: Colors.black54,
-                                        ),
-                                      ),
-                                      addVerticalSpace(10),
-                                      blackBoldText(
-                                        widget.userData['user_language'] == 'sw'
-                                            ? 'Makala'
-                                            : 'Blogs',
-                                      ),
-                                      addVerticalSpace(2.0),
-                                    ],
-                                  ),
-                                ),
-                              ),
-                              GestureDetector(
-                                onTap: () {
-                                  // Navigator.push(
-                                  //   context,
-                                  //   CupertinoPageRoute(
-                                  //     builder: (_) => AdminManageStorePage(
-                                  //       userId: widget.userId,
-                                  //       userData: widget.userData,
-                                  //     ),
-                                  //   ),
-                                  // );
-                                },
-                                child: Card(
-                                  shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(10.0),
-                                  ),
-                                  elevation: 2.0,
-                                  color: Colors.white,
-                                  child: Column(
-                                    mainAxisAlignment: MainAxisAlignment.center,
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.center,
-                                    children: [
-                                      const CircleAvatar(
-                                        radius: 30,
-                                        backgroundColor: Colors.black12,
-                                        child: Icon(
-                                          Icons.storefront_outlined,
-                                          size: 24,
-                                          color: Colors.black54,
-                                        ),
-                                      ),
-                                      addVerticalSpace(10),
-                                      blackBoldText(
-                                        widget.userData['user_language'] == 'sw'
-                                            ? 'Duka'
-                                            : 'Store',
-                                      ),
-                                      addVerticalSpace(2.0),
-                                    ],
-                                  ),
-                                ),
-                              ),
-                              GestureDetector(
-                                onTap: () {
-                                  // Navigator.push(
-                                  //   context,
-                                  //   CupertinoPageRoute(
-                                  //     builder: (_) => AdminManageSalesPage(
-                                  //       userId: widget.userId,
-                                  //       userData: widget.userData,
-                                  //     ),
-                                  //   ),
-                                  // );
-                                },
-                                child: Card(
-                                  shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(10.0),
-                                  ),
-                                  elevation: 2.0,
-                                  color: Colors.white,
-                                  child: Column(
-                                    mainAxisAlignment: MainAxisAlignment.center,
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.center,
-                                    children: [
-                                      const CircleAvatar(
-                                        radius: 30,
-                                        backgroundColor: Colors.black12,
-                                        child: Icon(
-                                          Icons.handshake_outlined,
-                                          size: 24,
-                                          color: Colors.black54,
-                                        ),
-                                      ),
-                                      addVerticalSpace(10),
-                                      blackBoldText(
-                                        widget.userData['user_language'] == 'sw'
-                                            ? 'Mauzo'
-                                            : 'Sales',
-                                      ),
-                                      addVerticalSpace(2.0),
-                                    ],
-                                  ),
-                                ),
-                              ),
-                              GestureDetector(
-                                onTap: () {
-                                  // Navigator.push(
-                                  //   context,
-                                  //   CupertinoPageRoute(
-                                  //     builder: (_) => AdminAddBannerPage(
-                                  //       userId: widget.userId,
-                                  //       userData: widget.userData,
-                                  //     ),
-                                  //   ),
-                                  // );
-                                },
-                                child: Card(
-                                  shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(10.0),
-                                  ),
-                                  elevation: 2.0,
-                                  color: Colors.white,
-                                  child: Column(
-                                    mainAxisAlignment: MainAxisAlignment.center,
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.center,
-                                    children: [
-                                      const CircleAvatar(
-                                        radius: 30,
-                                        backgroundColor: Colors.black12,
-                                        child: Icon(
-                                          Icons.ad_units_rounded,
-                                          size: 24,
-                                          color: Colors.black54,
-                                        ),
-                                      ),
-                                      addVerticalSpace(10),
-                                      blackBoldText(
-                                        widget.userData['user_language'] == 'sw'
-                                            ? 'Matangazo'
-                                            : 'Ads',
-                                      ),
-                                      addVerticalSpace(2.0),
-                                    ],
-                                  ),
-                                ),
-                              ),
+                              )
                             ],
                           ),
                           const SizedBox(
@@ -654,9 +461,7 @@ class _CompanyProfilePageState extends State<CompanyProfilePage> {
                         padding: const EdgeInsets.symmetric(
                             horizontal: 16.0, vertical: 6.0),
                         child: blackBoldText(
-                            widget.userData['user_language'] == 'sw'
-                                ? 'Ondoka'
-                                : 'Log out'),
+                            language == 'ro' ? 'Ondoka' : 'Log out'),
                       ),
                     ),
                   ),

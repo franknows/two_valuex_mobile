@@ -1,4 +1,3 @@
-import 'package:animated_flip_counter/animated_flip_counter.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
@@ -10,9 +9,11 @@ import 'package:two_value/screens/company/company_add_page.dart';
 import 'package:two_value/src/theme.dart';
 
 import '../company/company_home_view.dart';
+import '../company/company_news_page.dart';
+import '../company/company_notification_page.dart';
 import '../company/company_profile_page.dart';
 import '../company/company_support_page.dart';
-import '../messaging/messaging_page.dart';
+import '../company/company_task_view.dart';
 
 class CompanyHomePage extends StatefulWidget {
   final String userId;
@@ -27,15 +28,27 @@ class CompanyHomePage extends StatefulWidget {
 class _CompanyHomePageState extends State<CompanyHomePage> {
   final FirebaseAuth _firebaseAuth = FirebaseAuth.instance;
   var _currentIndex = 0;
+  DocumentSnapshot? _userData;
 
   @override
   void initState() {
     super.initState();
+    setState(() {
+      _userData = widget.userData;
+    });
+    _getUserData(widget.userId);
   }
 
-  @override
-  void dispose() {
-    super.dispose();
+  void _getUserData(String userId) {
+    FirebaseFirestore.instance
+        .collection('XUsers')
+        .doc(userId)
+        .snapshots()
+        .listen((DocumentSnapshot snapshot) {
+      setState(() {
+        _userData = snapshot;
+      });
+    });
   }
 
   @override
@@ -63,7 +76,6 @@ class _CompanyHomePageState extends State<CompanyHomePage> {
             ],
           ),
           actions: <Widget>[
-            _counter(widget.userData),
             _notificationMessage(
                 (widget.userData['notification_count']), widget.userData),
             _myProfile(),
@@ -186,8 +198,9 @@ class _CompanyHomePageState extends State<CompanyHomePage> {
         userData: widget.userData,
       );
     } else if (_currentIndex == 1) {
-      return Container(
-        color: Colors.black26,
+      return CompanyNewsPage(
+        userId: widget.userId,
+        userData: widget.userData,
       );
     } else if (_currentIndex == 2) {
       return CompanyAddPage(
@@ -195,8 +208,9 @@ class _CompanyHomePageState extends State<CompanyHomePage> {
         userData: widget.userData,
       );
     } else if (_currentIndex == 3) {
-      return Container(
-        color: Colors.black26,
+      return CompanyTaskView(
+        userId: widget.userId,
+        userData: widget.userData,
       );
     } else if (_currentIndex == 4) {
       return CompanySupportPage(
@@ -208,58 +222,6 @@ class _CompanyHomePageState extends State<CompanyHomePage> {
         color: Colors.black26,
       );
     }
-  }
-
-  Widget _counter(DocumentSnapshot myRealtimeInfo) {
-    return Center(
-      child: InkWell(
-        onTap: () {
-          // addCoinsDialog(myRealtimeInfo);
-        },
-        child: Container(
-          height: 26,
-          decoration: BoxDecoration(
-            color: Colors.teal.withOpacity(.1),
-            borderRadius: const BorderRadius.all(
-              Radius.circular(4.0),
-            ),
-            border: Border.all(
-              color: Colors.white,
-            ),
-          ),
-          child: Padding(
-            padding: const EdgeInsets.symmetric(
-              horizontal: 10.0,
-              vertical: 4.0,
-            ),
-            child: Row(
-              children: [
-                const Icon(
-                  CupertinoIcons.star_circle_fill,
-                  color: Colors.white,
-                  size: 13,
-                ),
-                const SizedBox(
-                  width: 4.0,
-                ),
-                AnimatedFlipCounter(
-                  duration: const Duration(milliseconds: 500),
-                  value: myRealtimeInfo['notification_count'],
-                  textStyle: GoogleFonts.quicksand(
-                    textStyle: const TextStyle(
-                      fontWeight: FontWeight.bold,
-                      fontSize: 12,
-                      letterSpacing: .5,
-                      color: Colors.white,
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ),
-      ),
-    );
   }
 
   Widget _notificationMessage(int count, DocumentSnapshot myRealtimeInfo) {
@@ -279,7 +241,7 @@ class _CompanyHomePageState extends State<CompanyHomePage> {
                     Navigator.push(
                       context,
                       CupertinoPageRoute(
-                        builder: (_) => MessagingPage(
+                        builder: (_) => CompanyNotificationsPage(
                           userId: widget.userId,
                           myUserInfo: myRealtimeInfo,
                         ),
@@ -327,7 +289,7 @@ class _CompanyHomePageState extends State<CompanyHomePage> {
             Navigator.push(
               context,
               CupertinoPageRoute(
-                builder: (_) => MessagingPage(
+                builder: (_) => CompanyNotificationsPage(
                   userId: widget.userId,
                   myUserInfo: myRealtimeInfo,
                 ),
@@ -354,7 +316,7 @@ class _CompanyHomePageState extends State<CompanyHomePage> {
               MaterialPageRoute(
                 builder: (_) => CompanyProfilePage(
                   userId: widget.userId,
-                  userData: widget.userData,
+                  userData: _userData!,
                 ),
               ),
             );

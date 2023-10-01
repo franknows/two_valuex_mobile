@@ -4,6 +4,7 @@ class TAppTheme {
   static const Color primaryColor = Color(0xFF1287c3);
   static const Color accentColor = Color(0xFFFFC107);
   static const Color errorColor = Color(0xFFCC0000);
+  static const Color greenColor = Color(0xFF28a745);
 
   ///Light theme
   static ThemeData lightTheme = ThemeData(

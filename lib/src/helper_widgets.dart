@@ -1,3 +1,4 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:chat_bubbles/chat_bubbles.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/cupertino.dart';
@@ -105,6 +106,19 @@ miniWhiteText(String txt) {
   );
 }
 
+miniGreenText(String txt) {
+  return Text(
+    txt,
+    style: GoogleFonts.quicksand(
+      textStyle: const TextStyle(
+        fontSize: 12,
+        color: TAppTheme.greenColor,
+        letterSpacing: .5,
+      ),
+    ),
+  );
+}
+
 miniBlackText(String txt) {
   return Text(
     txt,
@@ -153,6 +167,31 @@ blackNormalText(String txt) {
       color: Colors.black87,
       letterSpacing: .5,
     ),
+  );
+}
+
+blackNormalCenteredText(String txt) {
+  return Text(
+    txt,
+    style: GoogleFonts.quicksand(
+      fontSize: 14,
+      color: Colors.black87,
+      letterSpacing: .5,
+    ),
+    textAlign: TextAlign.center,
+  );
+}
+
+blackBioText(String txt) {
+  return Text(
+    txt,
+    style: GoogleFonts.quicksand(
+      fontSize: 14,
+      color: Colors.black87,
+      letterSpacing: .5,
+    ),
+    maxLines: 6,
+    overflow: TextOverflow.ellipsis,
   );
 }
 
@@ -206,6 +245,20 @@ bulletBlackText(String txt) {
           ),
         ),
       ),
+    ],
+  );
+}
+
+bulletColoredBlackText(String txt, MaterialColor color) {
+  return Row(
+    children: [
+      Icon(
+        CupertinoIcons.circle_fill,
+        size: 10,
+        color: color,
+      ),
+      addHorizontalSpace(10),
+      blackNormalText(txt)
     ],
   );
 }
@@ -1364,14 +1417,14 @@ advancedProfileTiles(String title, String body) {
 swToggleBox(String language) {
   return Container(
     decoration: BoxDecoration(
-      color: language == 'sw'
+      color: language == 'ro'
           ? const Color(0xff184a45).withOpacity(.1)
           : Colors.white,
       borderRadius: const BorderRadius.all(
         Radius.circular(4.0),
       ),
       border: Border.all(
-        color: language == 'sw'
+        color: language == 'ro'
             ? const Color(0xff184a45).withOpacity(.8)
             : Colors.grey.withOpacity(.4),
         width: 1.5,
@@ -1380,7 +1433,7 @@ swToggleBox(String language) {
     height: 36.0,
     child: Center(
       child: Text(
-        language == 'sw' ? 'KISWAHILI' : 'SWAHILI',
+        'ROMANIAN',
         style: GoogleFonts.quicksand(
           fontSize: 14,
           color: language == 'sw' ? const Color(0xff184a45) : Colors.grey,
@@ -1411,7 +1464,7 @@ engToggleBox(String language) {
     height: 36.0,
     child: Center(
       child: Text(
-        language == 'eng' ? 'ENGLISH' : 'KINGEREZA',
+        'ENGLISH',
         style: GoogleFonts.quicksand(
           fontSize: 14,
           color: language == 'eng' ? const Color(0xff184a45) : Colors.grey,
@@ -1421,6 +1474,228 @@ engToggleBox(String language) {
       ),
     ),
   );
+}
+
+///press item
+pressItem(DocumentSnapshot doc) {
+  return Column(
+    crossAxisAlignment: CrossAxisAlignment.start,
+    children: [
+      Stack(
+        children: [
+          ClipRRect(
+            borderRadius: BorderRadius.circular(10.0),
+            child: AspectRatio(
+              aspectRatio: 16 / 9,
+              child: Hero(
+                tag: 'pressHero${doc['press_id']}',
+                child: CachedNetworkImage(
+                  imageUrl: doc['press_image'],
+                  placeholder: (context, url) => Image.asset(
+                    'assets/images/vertical_placeholder.png',
+                    fit: BoxFit.cover,
+                  ),
+                  errorWidget: (context, url, error) => Image.asset(
+                    'assets/images/vertical_placeholder.png',
+                    fit: BoxFit.cover,
+                  ),
+                  fit: BoxFit.cover,
+                ),
+              ),
+            ),
+          ),
+          Positioned(
+            top: 10,
+            left: 10,
+            child: CircleAvatar(
+              radius: 8,
+              backgroundColor: doc['press_status'] == 'LIVE'
+                  ? Colors.green.withOpacity(.4)
+                  : Colors.blue.withOpacity(.4),
+              child: CircleAvatar(
+                radius: 4,
+                backgroundColor: doc['press_status'] == 'LIVE'
+                    ? Colors.green.withOpacity(.7)
+                    : Colors.blue.withOpacity(.7),
+              ),
+            ),
+          ),
+        ],
+      ),
+      addVerticalSpace(10),
+      Text(
+        doc['press_title'].toString().toUpperCase(),
+        style: GoogleFonts.quicksand(
+          fontSize: 14,
+          color: Colors.black54,
+          fontWeight: FontWeight.bold,
+          letterSpacing: .5,
+        ),
+        maxLines: 2,
+        overflow: TextOverflow.ellipsis,
+      ),
+      addVerticalSpace(4.0),
+      Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Row(
+            children: [
+              Icon(
+                Icons.person_rounded,
+                color: Colors.blueGrey.withOpacity(.5),
+                size: 14,
+              ),
+              addHorizontalSpace(10),
+              Text(
+                capitalize(doc['press_author']),
+                style: GoogleFonts.quicksand(
+                  fontSize: 12,
+                  color: Colors.blueGrey.withOpacity(.5),
+                  letterSpacing: .5,
+                ),
+                maxLines: 2,
+                overflow: TextOverflow.ellipsis,
+              ),
+            ],
+          ),
+          Text(
+            doc['press_time'] == null
+                ? '-'
+                : DateFormat('dd MMM, yyyy').format(
+                    DateTime.parse(
+                      doc['press_time'].toDate().toString(),
+                    ),
+                  ),
+            style: GoogleFonts.quicksand(
+              textStyle: TextStyle(
+                fontSize: 12.0,
+                color: Colors.blueGrey.withOpacity(.5),
+              ),
+            ),
+          ),
+        ],
+      ),
+      addVerticalSpace(4.0),
+      Text(
+        doc['press_summary'],
+        style: GoogleFonts.quicksand(
+          fontSize: 14,
+          color: Colors.black54,
+          letterSpacing: .5,
+        ),
+        maxLines: 4,
+        overflow: TextOverflow.ellipsis,
+      ),
+      addVerticalSpace(30.0),
+    ],
+  );
+}
+
+pressPublicItem(DocumentSnapshot doc) {
+  return Column(
+    crossAxisAlignment: CrossAxisAlignment.start,
+    children: [
+      ClipRRect(
+        borderRadius: BorderRadius.circular(10.0),
+        child: AspectRatio(
+          aspectRatio: 16 / 9,
+          child: Hero(
+            tag: 'pressHero${doc['press_id']}',
+            child: CachedNetworkImage(
+              imageUrl: doc['press_image'],
+              placeholder: (context, url) => Image.asset(
+                'assets/images/vertical_placeholder.png',
+                fit: BoxFit.cover,
+              ),
+              errorWidget: (context, url, error) => Image.asset(
+                'assets/images/vertical_placeholder.png',
+                fit: BoxFit.cover,
+              ),
+              fit: BoxFit.cover,
+            ),
+          ),
+        ),
+      ),
+      addVerticalSpace(10),
+      Text(
+        doc['press_title'].toString().toUpperCase(),
+        style: GoogleFonts.quicksand(
+          fontSize: 14,
+          color: Colors.black54,
+          fontWeight: FontWeight.bold,
+          letterSpacing: .5,
+        ),
+        maxLines: 2,
+        overflow: TextOverflow.ellipsis,
+      ),
+      addVerticalSpace(4.0),
+      Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Row(
+            children: [
+              Icon(
+                Icons.person_rounded,
+                color: Colors.blueGrey.withOpacity(.5),
+                size: 14,
+              ),
+              addHorizontalSpace(10),
+              Text(
+                capitalize(doc['press_author']),
+                style: GoogleFonts.quicksand(
+                  fontSize: 12,
+                  color: Colors.blueGrey.withOpacity(.5),
+                  letterSpacing: .5,
+                ),
+                maxLines: 2,
+                overflow: TextOverflow.ellipsis,
+              ),
+            ],
+          ),
+          Text(
+            doc['press_time'] == null
+                ? '-'
+                : DateFormat('dd MMM, yyyy').format(
+                    DateTime.parse(
+                      doc['press_time'].toDate().toString(),
+                    ),
+                  ),
+            style: GoogleFonts.quicksand(
+              textStyle: TextStyle(
+                fontSize: 12.0,
+                color: Colors.blueGrey.withOpacity(.5),
+              ),
+            ),
+          ),
+        ],
+      ),
+      addVerticalSpace(4.0),
+      Text(
+        doc['press_summary'],
+        style: GoogleFonts.quicksand(
+          fontSize: 14,
+          color: Colors.black54,
+          letterSpacing: .5,
+        ),
+        maxLines: 4,
+        overflow: TextOverflow.ellipsis,
+      ),
+      addVerticalSpace(30.0),
+    ],
+  );
+}
+
+String capitalize(String text) {
+  if (text.isEmpty) {
+    return text;
+  }
+  return text
+      .toLowerCase()
+      .split(' ')
+      .map((word) => word.isNotEmpty
+          ? '${word[0].toUpperCase()}${word.substring(1).toLowerCase()}'
+          : word)
+      .join(' ');
 }
 
 class WaveClipper extends CustomClipper<Path> {
