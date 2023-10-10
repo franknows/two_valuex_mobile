@@ -339,9 +339,7 @@ class _LoginScreenState extends State<LoginScreen> {
                             validator: (val) =>
                                 passwordValidator(password, language),
                           ),
-                          const SizedBox(
-                            height: 30,
-                          ),
+                          addVerticalSpace(30),
                           InkWell(
                             onTap: () {
                               FocusScope.of(context).unfocus();

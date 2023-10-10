@@ -127,9 +127,10 @@ class _CompanySinglePressViewState extends State<CompanySinglePressView> {
                             ? 'Despre companie'
                             : 'About company'),
                         addVerticalSpace(10.0),
-                        blackNormalText(widget.pressData['press_about_company']
+                        blackNormalText(removeHtmlTags(widget
+                            .pressData['press_about_company']
                             .toString()
-                            .trim()),
+                            .trim())),
                         addVerticalSpace(30.0),
                         Container(
                           key: ValueKey(urls[0]),

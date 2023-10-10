@@ -3,6 +3,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:two_value/src/helper_widgets.dart';
 
+import '../../src/theme.dart';
 import 'company_single_press_view.dart';
 
 class CompanyTaskView extends StatefulWidget {
@@ -29,6 +30,7 @@ class _CompanyTaskViewState extends State<CompanyTaskView> {
 
   @override
   Widget build(BuildContext context) {
+    var size = MediaQuery.of(context).size;
     return Container(
       color: Colors.grey.withOpacity(.1),
       height: MediaQuery.of(context).size.height,
@@ -57,12 +59,12 @@ class _CompanyTaskViewState extends State<CompanyTaskView> {
                     .snapshots(),
                 builder: (context, snapshot) {
                   if (!snapshot.hasData) {
-                    return const SizedBox(
-                      height: 300,
+                    return SizedBox(
+                      height: size.height - 300,
                       child: Center(
                         child: CircularProgressIndicator(
-                          strokeWidth: 3,
-                          color: Colors.blueGrey,
+                          strokeWidth: 4,
+                          color: TAppTheme.primaryColor.withOpacity(.4),
                           backgroundColor: Colors.white,
                         ),
                       ),

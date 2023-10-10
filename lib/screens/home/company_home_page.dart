@@ -6,6 +6,8 @@ import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:salomon_bottom_bar/salomon_bottom_bar.dart';
 import 'package:two_value/screens/company/company_add_page.dart';
+import 'package:two_value/screens/company/company_subscription_page.dart';
+import 'package:two_value/src/helper_widgets.dart';
 import 'package:two_value/src/theme.dart';
 
 import '../company/company_home_view.dart';
@@ -29,12 +31,14 @@ class _CompanyHomePageState extends State<CompanyHomePage> {
   final FirebaseAuth _firebaseAuth = FirebaseAuth.instance;
   var _currentIndex = 0;
   DocumentSnapshot? _userData;
+  String language = '';
 
   @override
   void initState() {
     super.initState();
     setState(() {
       _userData = widget.userData;
+      language = widget.userData['user_language'];
     });
     _getUserData(widget.userId);
   }
@@ -59,133 +63,204 @@ class _CompanyHomePageState extends State<CompanyHomePage> {
         statusBarIconBrightness: Brightness.light,
         systemNavigationBarColor: Colors.white,
       ),
-      child: Scaffold(
-        backgroundColor: Colors.white,
-        appBar: AppBar(
-          backgroundColor: TAppTheme.primaryColor,
-          elevation: 8,
-          title: const Row(
-            children: [
-              Image(
-                height: 18,
-                fit: BoxFit.cover,
-                image: AssetImage(
-                  'assets/images/nav_logo.png',
+      child: Theme(
+        data: Theme.of(context).copyWith(
+          popupMenuTheme: PopupMenuThemeData(
+            shape: RoundedRectangleBorder(
+              borderRadius:
+                  BorderRadius.circular(10), // Adjust this value as needed
+            ),
+          ),
+        ),
+        child: Scaffold(
+          backgroundColor: Colors.white,
+          appBar: AppBar(
+            backgroundColor: TAppTheme.primaryColor,
+            elevation: 8,
+            title: const Row(
+              children: [
+                Image(
+                  height: 18,
+                  fit: BoxFit.cover,
+                  image: AssetImage(
+                    'assets/images/nav_logo.png',
+                  ),
                 ),
+              ],
+            ),
+            actions: <Widget>[
+              _notificationMessage(
+                  (widget.userData['notification_count']), widget.userData),
+              PopupMenuButton<String>(
+                onSelected: (String result) {
+                  if (result == '0') {
+                    Navigator.push(
+                      context,
+                      CupertinoPageRoute(
+                        builder: (_) => CompanyProfilePage(
+                          userId: widget.userId,
+                          userData: _userData!,
+                        ),
+                      ),
+                    );
+                  } else {
+                    Navigator.push(
+                      context,
+                      CupertinoPageRoute(
+                        builder: (_) => CompanySubscriptionPage(
+                          userId: widget.userId,
+                          userData: _userData!,
+                        ),
+                      ),
+                    );
+                  }
+                },
+                itemBuilder: (BuildContext context) => <PopupMenuEntry<String>>[
+                  PopupMenuItem<String>(
+                    value: '0',
+                    child: Row(
+                      children: [
+                        const Icon(
+                          CupertinoIcons.person_alt_circle_fill,
+                          color: Colors.black87,
+                          size: 20,
+                        ),
+                        addHorizontalSpace(10),
+                        blackBoldTextWithSize(
+                            language == 'ro' ? 'Profil' : 'Profile', 16),
+                      ],
+                    ),
+                  ),
+                  PopupMenuItem<String>(
+                    value: '1',
+                    child: Row(
+                      children: [
+                        const Icon(
+                          CupertinoIcons.creditcard_fill,
+                          color: Colors.black87,
+                          size: 20,
+                        ),
+                        addHorizontalSpace(10),
+                        blackBoldTextWithSize(
+                            language == 'ro' ? 'Abonament' : 'Subscription',
+                            16),
+                      ],
+                    ),
+                  ),
+                ],
               ),
             ],
           ),
-          actions: <Widget>[
-            _notificationMessage(
-                (widget.userData['notification_count']), widget.userData),
-            _myProfile(),
-          ],
-        ),
-        body: decider(),
-        bottomNavigationBar: SalomonBottomBar(
-          currentIndex: _currentIndex,
-          onTap: (i) => setState(() => _currentIndex = i),
-          items: [
-            /// Home
-            SalomonBottomBarItem(
-              icon: Image(
-                image: const AssetImage('assets/icons/home-dark.png'),
-                height: 20,
-                width: 20,
-                color: _currentIndex == 0 ? Colors.teal : Colors.black,
-              ),
-              title: Text(
-                widget.userData['user_language'] == 'ro' ? 'Acasă' : 'Home',
-                style: GoogleFonts.quicksand(
-                  textStyle: const TextStyle(
-                    fontSize: 14.0,
-                    letterSpacing: .5,
+          body: decider(),
+          bottomNavigationBar: SalomonBottomBar(
+            currentIndex: _currentIndex,
+            onTap: (i) => setState(() => _currentIndex = i),
+            items: [
+              /// Home
+              SalomonBottomBarItem(
+                icon: Image(
+                  image: const AssetImage('assets/icons/home-dark.png'),
+                  height: 20,
+                  width: 20,
+                  color: _currentIndex == 0 ? Colors.teal : Colors.black,
+                ),
+                title: Text(
+                  widget.userData['user_language'] == 'ro' ? 'Acasă' : 'Home',
+                  style: GoogleFonts.quicksand(
+                    textStyle: const TextStyle(
+                      fontSize: 14.0,
+                      letterSpacing: .5,
+                    ),
                   ),
                 ),
+                selectedColor: Colors.teal,
               ),
-              selectedColor: Colors.teal,
-            ),
 
-            /// Likes
-            SalomonBottomBarItem(
-              icon: Image(
-                image: const AssetImage('assets/icons/from_dark.png'),
-                height: 20,
-                width: 20,
-                color: _currentIndex == 1 ? Colors.teal : Colors.black,
-              ),
-              title: Text(
-                widget.userData['user_language'] == 'ro' ? 'Știri' : 'News',
-                style: GoogleFonts.quicksand(
-                  textStyle: const TextStyle(
-                    fontSize: 14.0,
-                    letterSpacing: .5,
+              /// Likes
+              SalomonBottomBarItem(
+                icon: Image(
+                  image: const AssetImage('assets/icons/from_dark.png'),
+                  height: 20,
+                  width: 20,
+                  color: _currentIndex == 1 ? Colors.teal : Colors.black,
+                ),
+                title: Text(
+                  widget.userData['user_language'] == 'ro' ? 'Știri' : 'News',
+                  style: GoogleFonts.quicksand(
+                    textStyle: const TextStyle(
+                      fontSize: 14.0,
+                      letterSpacing: .5,
+                    ),
                   ),
                 ),
+                selectedColor: Colors.teal,
               ),
-              selectedColor: Colors.teal,
-            ),
 
-            /// Likes
-            SalomonBottomBarItem(
-              icon: Image(
-                image: const AssetImage('assets/icons/add.png'),
-                height: 20,
-                width: 20,
-                color: _currentIndex == 2 ? Colors.teal : Colors.black,
-              ),
-              title: Text(
-                widget.userData['user_language'] == 'ro' ? 'Adăuga' : 'Add',
-                style: GoogleFonts.quicksand(
-                  textStyle: const TextStyle(
-                    fontSize: 14.0,
-                    letterSpacing: .5,
+              /// Likes
+              SalomonBottomBarItem(
+                icon: Image(
+                  image: const AssetImage('assets/icons/add.png'),
+                  height: 20,
+                  width: 20,
+                  color: _currentIndex == 2 ? Colors.teal : Colors.black,
+                ),
+                title: Text(
+                  widget.userData['user_language'] == 'ro' ? 'Adăuga' : 'Add',
+                  style: GoogleFonts.quicksand(
+                    textStyle: const TextStyle(
+                      fontSize: 14.0,
+                      letterSpacing: .5,
+                    ),
                   ),
                 ),
+                selectedColor: Colors.teal,
               ),
-              selectedColor: Colors.teal,
-            ),
 
-            /// Search
-            SalomonBottomBarItem(
-              icon: Image(
-                image: const AssetImage('assets/icons/edit_dark.png'),
-                height: 20,
-                width: 20,
-                color: _currentIndex == 3 ? Colors.teal : Colors.black,
-              ),
-              title: Text(
-                widget.userData['user_language'] == 'ro' ? 'Sarcini' : 'Tasks',
-                style: GoogleFonts.quicksand(
-                  textStyle: const TextStyle(
-                    fontSize: 14.0,
-                    letterSpacing: .5,
+              /// Search
+              SalomonBottomBarItem(
+                icon: Image(
+                  image: const AssetImage('assets/icons/edit_dark.png'),
+                  height: 20,
+                  width: 20,
+                  color: _currentIndex == 3 ? Colors.teal : Colors.black,
+                ),
+                title: Text(
+                  widget.userData['user_language'] == 'ro'
+                      ? 'Sarcini'
+                      : 'Tasks',
+                  style: GoogleFonts.quicksand(
+                    textStyle: const TextStyle(
+                      fontSize: 14.0,
+                      letterSpacing: .5,
+                    ),
                   ),
                 ),
+                selectedColor: Colors.teal,
               ),
-              selectedColor: Colors.teal,
-            ),
 
-            /// Profile
-            SalomonBottomBarItem(
-              icon: Image(
-                image: const AssetImage('assets/icons/chat.png'),
-                height: 20,
-                width: 20,
-                color: _currentIndex == 4 ? Colors.teal : Colors.black,
-              ),
-              title: Text(
-                widget.userData['user_language'] == 'ro' ? 'Suport' : 'Support',
-                style: GoogleFonts.quicksand(
-                  textStyle: const TextStyle(
-                    fontSize: 14.0,
-                    letterSpacing: .5,
+              /// Profile
+              SalomonBottomBarItem(
+                icon: Image(
+                  image: const AssetImage('assets/icons/chat.png'),
+                  height: 20,
+                  width: 20,
+                  color: _currentIndex == 4 ? Colors.teal : Colors.black,
+                ),
+                title: Text(
+                  widget.userData['user_language'] == 'ro'
+                      ? 'Suport'
+                      : 'Support',
+                  style: GoogleFonts.quicksand(
+                    textStyle: const TextStyle(
+                      fontSize: 14.0,
+                      letterSpacing: .5,
+                    ),
                   ),
                 ),
+                selectedColor: Colors.teal,
               ),
-              selectedColor: Colors.teal,
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );
@@ -233,8 +308,8 @@ class _CompanyHomePageState extends State<CompanyHomePage> {
               padding: const EdgeInsets.only(left: 8.0),
               child: IconButton(
                   icon: const Icon(
-                    CupertinoIcons.bell_fill,
-                    size: 28,
+                    CupertinoIcons.bell,
+                    size: 24,
                     color: Colors.white,
                   ),
                   onPressed: () {
@@ -281,8 +356,8 @@ class _CompanyHomePageState extends State<CompanyHomePage> {
         padding: const EdgeInsets.only(left: 8.0),
         child: IconButton(
           icon: const Icon(
-            CupertinoIcons.bell_fill,
-            size: 28,
+            CupertinoIcons.bell,
+            size: 24,
             color: Colors.white,
           ),
           onPressed: () {

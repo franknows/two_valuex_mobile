@@ -4,6 +4,7 @@ import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:linkwell/linkwell.dart';
 import 'package:two_value/screens/auth/verify_email_page.dart';
 
 import '../../src/helper_widgets.dart';
@@ -206,9 +207,53 @@ class _RegisterJournalistPageState extends State<RegisterJournalistPage> {
               },
               validator: (val) => passwordValidator(password, widget.language),
             ),
-            const SizedBox(
-              height: 30,
-            ),
+            addVerticalSpace(30),
+            widget.language == 'ro'
+                ? LinkWell(
+                    "Prin înregistrare sunteți de acord cu https://2value.ro/terms și https://2value.ro/gdpr",
+                    listOfNames: {
+                      'https://2value.ro/terms': 'termeni',
+                      'https://2value.ro/gdpr': 'confidențialitate'
+                    },
+                    textAlign: TextAlign.center,
+                    style: GoogleFonts.quicksand(
+                      textStyle: const TextStyle(
+                        fontSize: 14.0,
+                        color: Colors.black87,
+                        letterSpacing: .5,
+                      ),
+                    ),
+                    linkStyle: GoogleFonts.quicksand(
+                      textStyle: const TextStyle(
+                        fontSize: 14.0,
+                        color: Colors.blueAccent,
+                        letterSpacing: .5,
+                      ),
+                    ),
+                  )
+                : LinkWell(
+                    "By registering you agree to our https://2value.ro/terms and https://2value.ro/gdpr",
+                    listOfNames: {
+                      'https://2value.ro/terms': 'terms',
+                      'https://2value.ro/gdpr': 'privacy Policy'
+                    },
+                    textAlign: TextAlign.center,
+                    style: GoogleFonts.quicksand(
+                      textStyle: const TextStyle(
+                        fontSize: 14.0,
+                        color: Colors.black87,
+                        letterSpacing: .5,
+                      ),
+                    ),
+                    linkStyle: GoogleFonts.quicksand(
+                      textStyle: const TextStyle(
+                        fontSize: 14.0,
+                        color: Colors.blueAccent,
+                        letterSpacing: .5,
+                      ),
+                    ),
+                  ),
+            addVerticalSpace(30),
             InkWell(
               onTap: () {
                 FocusScope.of(context).unfocus();

@@ -1,9 +1,11 @@
+import 'package:chips_choice/chips_choice.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:two_value/src/helper_widgets.dart';
 
-import 'company_single_press_view.dart';
+import 'company_events_view.dart';
+import 'company_jobs_view.dart';
+import 'company_news_view.dart';
 
 class CompanyNewsPage extends StatefulWidget {
   final String userId;
@@ -17,6 +19,19 @@ class CompanyNewsPage extends StatefulWidget {
 
 class _CompanyNewsPageState extends State<CompanyNewsPage> {
   String language = '';
+  String category = 'NEWS';
+  final Map<String, Map<String, String>> categoryLabels = {
+    'ro': {
+      'NEWS': 'ȘTIRI',
+      'JOBS': 'LOCURI DE MUNCA',
+      'EVENTS': 'EVENIMENTE ',
+    },
+    'eng': {
+      'NEWS': 'NEWS',
+      'JOBS': 'JOBS',
+      'EVENTS': 'EVENTS',
+    },
+  };
 
   @override
   void initState() {
@@ -29,6 +44,7 @@ class _CompanyNewsPageState extends State<CompanyNewsPage> {
 
   @override
   Widget build(BuildContext context) {
+    var size = MediaQuery.of(context).size;
     return Container(
       color: Colors.grey.withOpacity(.1),
       height: MediaQuery.of(context).size.height,
@@ -36,82 +52,77 @@ class _CompanyNewsPageState extends State<CompanyNewsPage> {
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 16.0),
           child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               addVerticalSpace(20),
-              Row(
-                children: [
-                  blueBodyTextLarge(
-                    language == 'ro' ? 'ȘTIRI' : 'NEWS',
-                  ),
-                ],
-              ),
-              addVerticalSpace(20),
-              StreamBuilder<QuerySnapshot>(
-                stream: FirebaseFirestore.instance
-                    .collection('XArticles')
-                    .doc('Presses')
-                    .collection('Dominant')
-                    .where('press_status', isEqualTo: 'LIVE')
-                    .orderBy('press_time', descending: true)
-                    .limit(10)
-                    .snapshots(),
-                builder: (context, snapshot) {
-                  if (!snapshot.hasData) {
-                    return const SizedBox(
-                      height: 300,
-                      child: Center(
-                        child: CircularProgressIndicator(
-                          strokeWidth: 3,
-                          color: Colors.blueGrey,
-                          backgroundColor: Colors.white,
-                        ),
-                      ),
-                    );
-                  } else {
-                    if (snapshot.data!.docs.isEmpty) {
-                      return Column(
-                        children: [
-                          addVerticalSpace(200),
-                          const Center(
-                            child: Image(
-                              height: 200,
-                              image: AssetImage('assets/images/empty_list.png'),
-                            ),
-                          ),
-                        ],
-                      );
-                    } else {
-                      return ListView.builder(
-                        shrinkWrap: true,
-                        physics: const NeverScrollableScrollPhysics(),
-                        itemCount: snapshot.data!.docs.length,
-                        itemBuilder: (context, index) {
-                          DocumentSnapshot doc = snapshot.data!.docs[index];
-                          return InkWell(
-                            onTap: () {
-                              Navigator.push(
-                                context,
-                                CupertinoPageRoute(
-                                  builder: (_) => CompanySinglePressView(
-                                    userId: widget.userId,
-                                    userData: widget.userData,
-                                    pressData: doc,
-                                  ),
-                                ),
-                              );
-                            },
-                            child: pressPublicItem(doc),
-                          );
-                        },
-                      );
-                    }
-                  }
+              ChipsChoice<String>.single(
+                value: category,
+                onChanged: (val) {
+                  setState(() {
+                    category = val;
+                  });
                 },
+                choiceItems: C2Choice.listFrom<String, String>(
+                  source: categoryLabels[language]!.keys.toList(),
+                  value: (i, v) => v,
+                  label: (i, v) => categoryLabels[language]![v]!,
+                ),
+                choiceBuilder: (item, index) {
+                  return ChoiceChip(
+                    label: category == item.value
+                        ? whiteChipText(item.label)
+                        : blackChipText(item.label),
+                    selected: category == item.value,
+                    onSelected: (selected) {
+                      setState(() {
+                        category = item.value;
+                      });
+                    },
+                    selectedColor: Colors
+                        .blueGrey, // The background color for selected items
+                    backgroundColor: Colors.grey[
+                        300], // The background color for non-selected items
+                    padding: EdgeInsets.symmetric(horizontal: 10),
+                  );
+                },
+                wrapped: true,
+                wrapCrossAlignment: WrapCrossAlignment.start,
+                alignment: WrapAlignment.start,
+                runAlignment: WrapAlignment.start,
+                padding: EdgeInsets.zero,
+                spacing: 10,
+                runSpacing: 0,
               ),
+              addVerticalSpace(10),
+              decideView(),
             ],
           ),
         ),
       ),
     );
+  }
+
+  Widget decideView() {
+    if (category == 'NEWS') {
+      return CompanyNewsView(
+        userId: widget.userId,
+        userData: widget.userData,
+      );
+    } else if (category == 'JOBS') {
+      return CompanyJobsView(
+        userId: widget.userId,
+        userData: widget.userData,
+      );
+    } else if (category == 'EVENTS') {
+      return CompanyEventsView(
+        userId: widget.userId,
+        userData: widget.userData,
+      );
+    } else {
+      return CompanyNewsView(
+        userId: widget.userId,
+        userData: widget.userData,
+      );
+    }
   }
 }

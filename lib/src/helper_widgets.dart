@@ -1,8 +1,10 @@
+import 'package:animated_text_kit/animated_text_kit.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:chat_bubbles/chat_bubbles.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_chat_bubble/chat_bubble.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
 
@@ -346,6 +348,115 @@ Widget simpleRoundedButton(String text) {
           letterSpacing: .5,
         ),
         textAlign: TextAlign.center,
+      ),
+    ),
+  );
+}
+
+Widget simpleDarkRoundedButton(String text) {
+  return Container(
+    height: 40.0,
+    width: double.infinity,
+    decoration: BoxDecoration(
+      borderRadius: BorderRadius.circular(20.0),
+      color: TAppTheme.darkBlue,
+      border: Border.all(
+        color: TAppTheme.darkBlue,
+        width: 1.5,
+      ),
+    ),
+    child: Center(
+      child: Text(
+        text,
+        style: GoogleFonts.quicksand(
+          color: Colors.white,
+          fontWeight: FontWeight.bold,
+          fontSize: 18,
+          letterSpacing: .5,
+        ),
+        textAlign: TextAlign.center,
+      ),
+    ),
+  );
+}
+
+Widget nextButton(String text) {
+  return Container(
+    height: 40.0,
+    width: 160,
+    decoration: BoxDecoration(
+      borderRadius: BorderRadius.circular(20.0),
+      color: TAppTheme.darkBlue,
+      border: Border.all(
+        color: Colors.blueGrey.withOpacity(.4),
+        width: 1.5,
+      ),
+    ),
+    child: Center(
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 12.0),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.end,
+          children: [
+            Text(
+              text,
+              style: GoogleFonts.quicksand(
+                color: Colors.white,
+                // fontWeight: FontWeight.bold,
+                fontSize: 16,
+                letterSpacing: .5,
+              ),
+              textAlign: TextAlign.center,
+            ),
+            addHorizontalSpace(10),
+            const Icon(
+              CupertinoIcons.forward,
+              color: Colors.white,
+              size: 16,
+            ),
+          ],
+        ),
+      ),
+    ),
+  );
+}
+
+Widget previousButton(String text) {
+  return Container(
+    height: 40.0,
+    width: 160,
+    decoration: BoxDecoration(
+      borderRadius: BorderRadius.circular(20.0),
+      color: TAppTheme.darkBlue,
+      border: Border.all(
+        color: Colors.blueGrey.withOpacity(.4),
+        width: 1.5,
+      ),
+    ),
+    child: Center(
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 12.0),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.start,
+          children: [
+            const Icon(
+              CupertinoIcons.back,
+              color: Colors.white,
+              size: 16,
+            ),
+            addHorizontalSpace(10),
+            Text(
+              text,
+              style: GoogleFonts.quicksand(
+                color: Colors.white,
+                // fontWeight: FontWeight.bold,
+                fontSize: 16,
+                letterSpacing: .5,
+              ),
+              textAlign: TextAlign.center,
+            ),
+          ],
+        ),
       ),
     ),
   );
@@ -1136,6 +1247,36 @@ dialogBodyText(String txt) {
   );
 }
 
+blackChipText(String txt) {
+  return Text(
+    txt,
+    style: GoogleFonts.quicksand(
+      textStyle: const TextStyle(
+        fontSize: 12.0,
+        color: CupertinoColors.black,
+        // fontWeight: FontWeight.bold,
+        letterSpacing: .5,
+      ),
+    ),
+    textAlign: TextAlign.center,
+  );
+}
+
+whiteChipText(String txt) {
+  return Text(
+    txt,
+    style: GoogleFonts.quicksand(
+      textStyle: const TextStyle(
+        fontSize: 12.0,
+        color: CupertinoColors.white,
+        // fontWeight: FontWeight.bold,
+        letterSpacing: .5,
+      ),
+    ),
+    textAlign: TextAlign.center,
+  );
+}
+
 ///chat bubbles
 
 newSenderChatBubble(DocumentSnapshot myMessages, int index, double width) {
@@ -1591,6 +1732,126 @@ pressItem(DocumentSnapshot doc) {
   );
 }
 
+leftInstructor(double width, String image, String text) {
+  return Padding(
+    padding: const EdgeInsets.only(top: 20.0),
+    child: Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      crossAxisAlignment: CrossAxisAlignment.end,
+      children: [
+        Image(
+          image: AssetImage(image),
+          height: 60,
+          width: 60,
+        ),
+        Padding(
+          padding: const EdgeInsets.only(bottom: 28.0),
+          child: ChatBubble(
+            clipper: ChatBubbleClipper3(
+              type: BubbleType.receiverBubble,
+            ),
+            backGroundColor: const Color(0xffd7dde9),
+            elevation: 1.0,
+            shadowColor: Colors.grey,
+            child: SizedBox(
+              width: width * 0.68,
+              child: DefaultTextStyle(
+                style: GoogleFonts.quicksand(
+                  color: Colors.black87,
+                  fontSize: 14,
+                  letterSpacing: .5,
+                ),
+                textAlign: TextAlign.center,
+                child: AnimatedTextKit(
+                  animatedTexts: [
+                    TypewriterAnimatedText(
+                      text,
+                      textAlign: TextAlign.start,
+                      speed: const Duration(
+                        milliseconds: 80,
+                      ),
+                      textStyle: GoogleFonts.quicksand(
+                        fontSize: 14,
+                        color: Colors.black,
+                        letterSpacing: .5,
+                      ),
+                    ),
+                  ],
+                  onTap: null,
+                  pause: const Duration(milliseconds: 3000),
+                  repeatForever: false,
+                  isRepeatingAnimation: false,
+                ),
+              ),
+            ),
+          ),
+        ),
+      ],
+    ),
+  );
+}
+
+rightInstructor(double width, String text) {
+  return Padding(
+    padding: const EdgeInsets.only(top: 20.0),
+    child: Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      crossAxisAlignment: CrossAxisAlignment.end,
+      children: [
+        Padding(
+            padding: const EdgeInsets.only(bottom: 28.0),
+            child: ChatBubble(
+              clipper: ChatBubbleClipper3(
+                type: BubbleType.sendBubble,
+              ),
+              backGroundColor: const Color(0xffd7dde9),
+              elevation: 1.0,
+              shadowColor: Colors.grey,
+              child: Container(
+                // constraints: BoxConstraints(
+                //   maxWidth: MediaQuery.of(context).size.width * 0.7,
+                // ),
+                width: width * 0.68,
+                child: DefaultTextStyle(
+                  style: GoogleFonts.quicksand(
+                    color: Colors.black87,
+                    fontSize: 14,
+                    letterSpacing: .5,
+                  ),
+                  textAlign: TextAlign.center,
+                  child: AnimatedTextKit(
+                    animatedTexts: [
+                      TypewriterAnimatedText(
+                        text,
+                        textAlign: TextAlign.start,
+                        speed: const Duration(
+                          milliseconds: 80,
+                        ),
+                        textStyle: GoogleFonts.quicksand(
+                          fontSize: 14,
+                          color: Colors.black,
+                          letterSpacing: .5,
+                        ),
+                      ),
+                    ],
+                    onTap: null,
+                    pause: const Duration(milliseconds: 3000),
+                    repeatForever: false,
+                    isRepeatingAnimation: false,
+                  ),
+                ),
+              ),
+            )),
+        const Image(
+          image: AssetImage('assets/personas/sixth_female.png'),
+          height: 60,
+          width: 60,
+        ),
+      ],
+    ),
+  );
+}
+
 pressPublicItem(DocumentSnapshot doc) {
   return Column(
     crossAxisAlignment: CrossAxisAlignment.start,
@@ -1698,6 +1959,33 @@ String capitalize(String text) {
       .join(' ');
 }
 
+Widget ctaButton(String text, BuildContext context) {
+  return Container(
+    height: 36.0,
+    width: MediaQuery.of(context).size.width - 32,
+    decoration: BoxDecoration(
+      borderRadius: BorderRadius.circular(10.0),
+      color: TAppTheme.primaryColor,
+      border: Border.all(
+        color: TAppTheme.primaryColor,
+        width: 1.5,
+      ),
+    ),
+    child: Center(
+      child: Text(
+        text,
+        style: GoogleFonts.quicksand(
+          color: Colors.white,
+          fontWeight: FontWeight.bold,
+          fontSize: 14,
+          letterSpacing: .5,
+        ),
+        textAlign: TextAlign.center,
+      ),
+    ),
+  );
+}
+
 class WaveClipper extends CustomClipper<Path> {
   @override
   Path getClip(Size size) {
@@ -1723,5 +2011,110 @@ class WaveClipper extends CustomClipper<Path> {
   bool shouldReclip(covariant CustomClipper<Path> oldClipper) {
     // TODO: implement shouldReclip
     return true;
+  }
+}
+
+String removeHtmlTags(String htmlText) {
+  final RegExp regExp = RegExp(r'<[^>]*>', multiLine: true);
+  return htmlText.replaceAll(regExp, '');
+}
+
+class CustomTextFormField extends StatelessWidget {
+  final String labelText;
+  final String hintText;
+  final IconData? icon;
+  final TextEditingController? controller;
+  final FormFieldValidator<String>? validator;
+  final TextInputType keyboardType;
+  final TextCapitalization textCapitalization;
+  final bool obscureText;
+  // ... you can add other properties that TextFormField supports
+
+  const CustomTextFormField({
+    super.key,
+    required this.labelText,
+    this.hintText = '',
+    this.icon,
+    this.controller,
+    this.validator,
+    this.keyboardType = TextInputType.text,
+    this.textCapitalization = TextCapitalization.sentences,
+    this.obscureText = false,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return TextFormField(
+      controller: controller,
+      validator: validator,
+      keyboardType: keyboardType,
+      obscureText: obscureText,
+      textCapitalization: TextCapitalization.sentences,
+      maxLines: null,
+      style: GoogleFonts.quicksand(
+        textStyle: const TextStyle(
+          fontSize: 16.0,
+          color: Colors.black54,
+          letterSpacing: .5,
+        ),
+      ),
+      decoration: InputDecoration(
+        filled: true,
+        labelText: labelText,
+        labelStyle: GoogleFonts.quicksand(
+          textStyle: const TextStyle(
+            fontSize: 16.0,
+            color: Colors.grey,
+            fontWeight: FontWeight.bold,
+            letterSpacing: .5,
+          ),
+        ),
+        helperStyle: GoogleFonts.quicksand(
+          textStyle: const TextStyle(
+            fontSize: 16.0,
+            color: Colors.black54,
+            letterSpacing: .5,
+          ),
+        ),
+        errorStyle: GoogleFonts.quicksand(
+          textStyle: const TextStyle(
+            fontSize: 12.0,
+            color: TAppTheme.errorColor,
+            letterSpacing: .5,
+          ),
+        ),
+        prefixIconColor: Colors.blueGrey,
+        contentPadding: const EdgeInsets.symmetric(
+          vertical: 8.0,
+          horizontal: 10.0,
+        ),
+        enabledBorder: OutlineInputBorder(
+          borderSide: const BorderSide(
+            width: 1.5,
+            color: Colors.grey,
+          ),
+          borderRadius: BorderRadius.circular(8.0),
+        ),
+        errorBorder: OutlineInputBorder(
+          borderSide: const BorderSide(width: 1.5, color: Colors.redAccent),
+          borderRadius: BorderRadius.circular(8.0),
+        ),
+        focusedBorder: OutlineInputBorder(
+          borderSide: const BorderSide(width: 1.5, color: Colors.grey),
+          borderRadius: BorderRadius.circular(8.0),
+        ),
+        focusedErrorBorder: OutlineInputBorder(
+          borderSide: const BorderSide(width: 1.5, color: Colors.red),
+          borderRadius: BorderRadius.circular(8.0),
+        ),
+      ),
+
+      // InputDecoration(
+      //   labelText: labelText,
+      //   hintText: hintText,
+      //   icon: icon != null ? Icon(icon) : null,
+      //   // ... you can customize other decoration properties
+      // ),
+    );
   }
 }

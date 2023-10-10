@@ -1,13 +1,16 @@
 import 'package:awesome_circular_chart/awesome_circular_chart.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:two_value/src/theme.dart';
 
 import '../../src/helper_widgets.dart';
+import '../auth/login_screen.dart';
 
 class CompanyProfilePage extends StatefulWidget {
   final String userId;
@@ -25,6 +28,7 @@ class _CompanyProfilePageState extends State<CompanyProfilePage> {
   final GlobalKey<AnimatedCircularChartState> _chartKey =
       GlobalKey<AnimatedCircularChartState>();
   int total = 0;
+  final FirebaseAuth auth = FirebaseAuth.instance;
 
   @override
   void initState() {
@@ -455,13 +459,13 @@ class _CompanyProfilePageState extends State<CompanyProfilePage> {
                   Center(
                     child: InkWell(
                       onTap: () {
-                        // openLogoutDialog(widget.userData['user_language']);
+                        openLogoutDialog(widget.userData['user_language']);
                       },
                       child: Padding(
                         padding: const EdgeInsets.symmetric(
                             horizontal: 16.0, vertical: 6.0),
                         child: blackBoldText(
-                            language == 'ro' ? 'Ondoka' : 'Log out'),
+                            language == 'ro' ? 'Deconectați-vă' : 'Log out'),
                       ),
                     ),
                   ),
@@ -485,5 +489,115 @@ class _CompanyProfilePageState extends State<CompanyProfilePage> {
             ),
           )),
     );
+  }
+
+  openLogoutDialog(String language) {
+    showDialog(
+      barrierDismissible: true,
+      context: context,
+      builder: (BuildContext context) {
+        return Dialog(
+          backgroundColor: Colors.white,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(16.0),
+          ),
+          child: Wrap(
+            children: [
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    const SizedBox(
+                      height: 16,
+                    ),
+                    Text(
+                      language == 'ro' ? 'Deconectați-vă' : 'Log out!',
+                      style: GoogleFonts.quicksand(
+                        textStyle: const TextStyle(
+                          fontSize: 16.0,
+                          color: Colors.black,
+                          fontWeight: FontWeight.bold,
+                          letterSpacing: .5,
+                        ),
+                      ),
+                      textAlign: TextAlign.center,
+                    ),
+                    const SizedBox(
+                      height: 6,
+                    ),
+                    Text(
+                      language == 'ro'
+                          ? 'Nu veți primi notificări în aplicație când sunteți afară.'
+                          : 'You will not receive in-app notifications when you are out.',
+                      style: GoogleFonts.quicksand(
+                        textStyle: const TextStyle(
+                          fontSize: 14.0,
+                          color: Colors.black,
+                          letterSpacing: .5,
+                        ),
+                      ),
+                      textAlign: TextAlign.center,
+                    ),
+                    const SizedBox(
+                      height: 16,
+                    ),
+                    Row(
+                      children: [
+                        Expanded(
+                          flex: 1,
+                          child: InkWell(
+                            onTap: () {
+                              Navigator.of(context).pop();
+                            },
+                            child: laterButton(
+                              language == 'ro' ? 'Anulare' : 'Cancel',
+                            ),
+                          ),
+                        ),
+                        const SizedBox(
+                          width: 10,
+                        ),
+                        Expanded(
+                          flex: 1,
+                          child: InkWell(
+                            onTap: () {
+                              Navigator.of(context).pop();
+                              _logOut();
+                            },
+                            child: dangerButton(
+                              language == 'ro' ? 'Deconectați-vă' : 'Logout',
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(
+                      height: 16,
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
+  Future<void> _logOut() async {
+    try {
+      await auth.signOut();
+      if (!mounted) return;
+      Navigator.of(context).pushAndRemoveUntil(
+        CupertinoPageRoute(builder: (context) => const LoginScreen()),
+        (r) => false,
+      );
+    } catch (e) {
+      if (kDebugMode) {
+        print(e.toString());
+      }
+    }
   }
 }

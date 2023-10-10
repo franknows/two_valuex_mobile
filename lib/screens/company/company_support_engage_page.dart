@@ -305,7 +305,7 @@ class Message extends StatelessWidget {
       child: type == MessageType.user
           ? BubbleSpecialThree(
               text: text,
-              color: Color(0xFF1B97F3),
+              color: const Color(0xFF1B97F3),
               tail: true,
               isSender: true,
               textStyle: GoogleFonts.quicksand(
@@ -316,7 +316,7 @@ class Message extends StatelessWidget {
             )
           : BubbleSpecialThree(
               text: text,
-              color: Color(0xFFE8E8EE),
+              color: const Color(0xFFE8E8EE),
               tail: true,
               isSender: false,
               textStyle: GoogleFonts.quicksand(
