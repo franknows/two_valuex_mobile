@@ -71,16 +71,18 @@ class _SetUpAccountPageState extends State<SetUpAccountPage> {
         .snapshots()
         .listen((DocumentSnapshot snapshot) {
       if (snapshot.exists) {
-        setState(() {
-          _userData = snapshot;
-          name = snapshot['user_name'];
-          registrationNo = snapshot['registration_number'];
-          userTown = snapshot['user_city'];
-          userAddress = snapshot['user_address'];
-          email = snapshot['user_email'];
-          userPhone = snapshot['user_phone'];
-          cui = snapshot['user_cui_code'];
-        });
+        if (mounted) {
+          setState(() {
+            _userData = snapshot;
+            name = snapshot['user_name'];
+            registrationNo = snapshot['registration_number'];
+            userTown = snapshot['user_city'];
+            userAddress = snapshot['user_address'];
+            email = snapshot['user_email'];
+            userPhone = snapshot['user_phone'];
+            cui = snapshot['user_cui_code'];
+          });
+        }
       } else {
         ///do nothing
       }

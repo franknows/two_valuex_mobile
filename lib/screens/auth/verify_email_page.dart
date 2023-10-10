@@ -230,7 +230,7 @@ class _VerifyEmailPageState extends State<VerifyEmailPage> {
                     ),
                     (r) => false);
               },
-              child: simpleRoundedButton(
+              child: simpleDarkRoundedButton(
                 language == 'ro' ? 'Continua!' : 'Continue',
               ),
             ),

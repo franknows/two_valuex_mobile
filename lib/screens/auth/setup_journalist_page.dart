@@ -274,7 +274,7 @@ class _SetupJournalistPageState extends State<SetupJournalistPage> {
                           );
                         }
                       },
-                      child: simpleRoundedButton(
+                      child: simpleDarkRoundedButton(
                         language == 'Romanian' ? 'CONTINUA' : 'CONTINUE',
                       ),
                     ),

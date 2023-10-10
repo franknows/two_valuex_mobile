@@ -306,7 +306,7 @@ class _SetupCompanyPageState extends State<SetupCompanyPage> {
                           );
                         }
                       },
-                      child: simpleRoundedButton(
+                      child: simpleDarkRoundedButton(
                         language == 'Romanian' ? 'CONTINUA' : 'CONTINUE',
                       ),
                     ),

@@ -375,36 +375,4 @@ class _CompanyHomePageState extends State<CompanyHomePage> {
       );
     }
   }
-
-  Widget _myProfile() {
-    return Padding(
-      padding: const EdgeInsets.all(0.0),
-      child: IconButton(
-          icon: const Icon(
-            CupertinoIcons.person_alt_circle_fill,
-            size: 28,
-            color: Colors.white,
-          ),
-          onPressed: () async {
-            Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (_) => CompanyProfilePage(
-                  userId: widget.userId,
-                  userData: _userData!,
-                ),
-              ),
-            );
-            // await _firebaseAuth.signOut().then(
-            //   (res) {
-            //     Navigator.of(context).pushAndRemoveUntil(
-            //         CupertinoPageRoute(
-            //           builder: (context) => const LoginScreen(),
-            //         ),
-            //         (r) => false);
-            //   },
-            // );
-          }),
-    );
-  }
 }

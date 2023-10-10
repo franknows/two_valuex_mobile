@@ -6,25 +6,27 @@ import '../../src/helper_widgets.dart';
 import '../../src/theme.dart';
 import 'company_single_press_view.dart';
 
-class CompanyEventsView extends StatefulWidget {
+class JournalistNewsView extends StatefulWidget {
   final String userId;
   final DocumentSnapshot userData;
-  const CompanyEventsView(
+  const JournalistNewsView(
       {super.key, required this.userId, required this.userData});
 
   @override
-  State<CompanyEventsView> createState() => _CompanyEventsViewState();
+  State<JournalistNewsView> createState() => _JournalistNewsViewState();
 }
 
-class _CompanyEventsViewState extends State<CompanyEventsView> {
+class _JournalistNewsViewState extends State<JournalistNewsView> {
   @override
   Widget build(BuildContext context) {
     var size = MediaQuery.of(context).size;
     return StreamBuilder<QuerySnapshot>(
       stream: FirebaseFirestore.instance
-          .collection('XEvents')
-          .where('event_visibility', isEqualTo: true)
-          .orderBy('event_posted_time', descending: true)
+          .collection('XArticles')
+          .doc('Presses')
+          .collection('Dominant')
+          .where('press_status', isEqualTo: 'LIVE')
+          .orderBy('press_time', descending: true)
           .limit(10)
           .snapshots(),
       builder: (context, snapshot) {
@@ -59,7 +61,7 @@ class _CompanyEventsViewState extends State<CompanyEventsView> {
               itemCount: snapshot.data!.docs.length,
               itemBuilder: (context, index) {
                 DocumentSnapshot doc = snapshot.data!.docs[index];
-                return GestureDetector(
+                return InkWell(
                   onTap: () {
                     Navigator.push(
                       context,
@@ -72,7 +74,7 @@ class _CompanyEventsViewState extends State<CompanyEventsView> {
                       ),
                     );
                   },
-                  child: eventPublicItem(doc, widget.userId),
+                  child: pressPublicItem(doc),
                 );
               },
             );
