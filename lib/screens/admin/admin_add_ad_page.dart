@@ -2,7 +2,6 @@ import 'dart:io';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_storage/firebase_storage.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -14,84 +13,98 @@ import 'package:overlay_loader_with_app_icon/overlay_loader_with_app_icon.dart';
 import '../../src/helper_widgets.dart';
 import '../../src/theme.dart';
 
-class AddStoriesPage extends StatefulWidget {
-  const AddStoriesPage({super.key});
+class AdminAddAdPage extends StatefulWidget {
+  final String userId;
+  final DocumentSnapshot userData;
+  const AdminAddAdPage(
+      {super.key, required this.userId, required this.userData});
 
   @override
-  State<AddStoriesPage> createState() => _AddStoriesPageState();
+  State<AdminAddAdPage> createState() => _AdminAddAdPageState();
 }
 
-class _AddStoriesPageState extends State<AddStoriesPage> {
+class _AdminAddAdPageState extends State<AdminAddAdPage> {
   final _formKey = GlobalKey<FormState>();
-  final DateTime now = DateTime.now();
+  String description = '';
+  String link = '';
+  bool loading = false;
+  final ImagePicker _picker = ImagePicker();
   File? _imageFile;
+  String selectedCta = 'Book Now';
+  List<String> ctaList = [
+    'Book Now',
+    'Buy Now',
+    'Contact Us',
+    'Discover More',
+    'Download Now',
+    'Get Started',
+    'Get the App',
+    'Get Yours',
+    'Join Now',
+    'Learn More',
+    'Register Now',
+    'Request Quote',
+    'Send Message',
+    'Shop Now',
+    'Sign Up',
+    'Start Trial',
+    'Subscribe Now',
+    'Try For Free',
+  ];
 
-  void saveStory(String thumbUrl) {
-    DocumentReference ds =
-        FirebaseFirestore.instance.collection('TheStories').doc();
+  void saveData(String url) {
+    DocumentReference ds = FirebaseFirestore.instance.collection('XAds').doc();
 
     Map<String, dynamic> tasks = {
-      'story_video_url': '-',
-      'story_thumbnail_url': thumbUrl,
-      'story_title_sw': storyTitle,
-      'story_title_en': storyTitle,
-      'story_summary_sw': storySummary,
-      'story_summary_en': storySummary,
-      'story_body_sw': storyBody,
-      'story_body_en': storyBody,
-      'story_id': ds.id,
-      'story_gender': '-',
-      'story_tags': FieldValue.arrayUnion([]),
-      'story_users': FieldValue.arrayUnion([]),
-      'story_usage_count': 0,
-      'story_view_count': 0,
-      'story_name': now.millisecondsSinceEpoch.toString(),
-      'story_visibility': true,
-      'story_visible_areas': FieldValue.arrayUnion(['-']),
-      'story_posted_time': FieldValue.serverTimestamp(),
-      'story_posted_mills': DateTime.now().millisecondsSinceEpoch,
+      'ad_image': url,
+      'ad_link': link,
+      'ad_description': description,
+      'ad_id': ds.id,
+      'ad_poster': widget.userId,
+      'ad_clicks_count': 0,
+      'ad_visibility': true,
+      'ad_cta': selectedCta,
+      'ad_visible_areas': FieldValue.arrayUnion(['-']),
+      'ad_posted_time': FieldValue.serverTimestamp(),
+      'ad_posted_mills': DateTime.now().millisecondsSinceEpoch,
     };
+
     ds.set(tasks).whenComplete(() {
-      snackSuccess('Uploaded successfully!', context);
       Navigator.pop(context);
     });
   }
 
   @override
-  void initState() {
-    super.initState();
-  }
-
-  @override
-  void dispose() {
-    super.dispose();
-  }
-
-  String storySummary = '';
-  String storyBody = '';
-  String storyTitle = '';
-  bool loading = false;
-  final ImagePicker _picker = ImagePicker();
-
-  @override
   Widget build(BuildContext context) {
     return AnnotatedRegion<SystemUiOverlayStyle>(
-      value: SystemUiOverlayStyle(
-          systemNavigationBarColor: Colors.white,
-          statusBarColor: Colors.transparent,
-          statusBarIconBrightness: Brightness.light,
-          systemNavigationBarDividerColor: Colors.grey.shade200),
+      value: const SystemUiOverlayStyle(
+        systemNavigationBarColor: Colors.white,
+        statusBarColor: Colors.transparent,
+        statusBarIconBrightness: Brightness.dark,
+      ),
       child: OverlayLoaderWithAppIcon(
         isLoading: loading,
         overlayBackgroundColor: TAppTheme.primaryColor,
         circularProgressColor: TAppTheme.accentColor,
         borderRadius: 15,
-        appIcon: const Padding(
-          padding: EdgeInsets.all(10),
-          child: Icon(
-            CupertinoIcons.hourglass,
-            size: 28,
-            color: TAppTheme.primaryColor,
+        appIcon: Padding(
+          padding: const EdgeInsets.all(10),
+          child: Container(
+            decoration: BoxDecoration(
+              color: TAppTheme.primaryColor,
+              border: Border.all(
+                color: TAppTheme.primaryColor,
+              ),
+              borderRadius: const BorderRadius.all(
+                Radius.circular(6.0),
+              ),
+            ),
+            child: Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: Image.asset(
+                'assets/images/no_bg_logo.png',
+              ),
+            ),
           ),
         ),
         appIconSize: 50,
@@ -101,7 +114,9 @@ class _AddStoriesPageState extends State<AddStoriesPage> {
             backgroundColor: TAppTheme.primaryColor,
             elevation: 4,
             title: Text(
-              'Write a story',
+              widget.userData['user_language'] == 'ro'
+                  ? 'Postați un anunț'
+                  : 'Post an Ad',
               style: GoogleFonts.quicksand(
                 textStyle: const TextStyle(
                   color: Colors.white,
@@ -166,18 +181,22 @@ class _AddStoriesPageState extends State<AddStoriesPage> {
                           letterSpacing: .5,
                         ),
                       ),
-                      decoration: inputDecoration('Story title'),
+                      decoration: inputDecoration(
+                          widget.userData['user_language'] == 'ro'
+                              ? 'Link de destinație'
+                              : 'Destination link'),
                       onChanged: (val) {
-                        setState(() => storyTitle = val.trim());
+                        setState(() => link = val.trim());
                       },
-                      validator: (value) =>
-                          value!.length < 3 ? 'Enter a valid tile' : null,
+                      validator: (value) => !Uri.parse(value!).isAbsolute
+                          ? 'Enter a valid link'
+                          : null,
                     ),
                     addVerticalSpace(20),
                     TextFormField(
                       textCapitalization: TextCapitalization.sentences,
                       keyboardType: TextInputType.text,
-                      maxLength: 500,
+                      maxLength: 120,
                       maxLines: null,
                       style: GoogleFonts.quicksand(
                         textStyle: const TextStyle(
@@ -187,41 +206,63 @@ class _AddStoriesPageState extends State<AddStoriesPage> {
                           letterSpacing: .5,
                         ),
                       ),
-                      decoration: inputDecoration('Story summary'),
+                      decoration: inputDecoration(
+                          widget.userData['user_language'] == 'ro'
+                              ? 'Descriere'
+                              : 'Description'),
                       onChanged: (val) {
-                        setState(() => storySummary = val.trim());
+                        setState(() => description = val.trim());
                       },
                       validator: (value) =>
-                          value!.length < 30 ? ('Summary too short') : null,
+                          value!.length < 30 ? ('Description too short') : null,
                     ),
                     addVerticalSpace(20),
-                    TextFormField(
-                      textCapitalization: TextCapitalization.sentences,
-                      keyboardType: TextInputType.multiline,
-                      maxLength: 30000,
-                      maxLines: null,
-                      style: GoogleFonts.quicksand(
-                        textStyle: const TextStyle(
-                          fontSize: 16.0,
-                          color: Colors.black54,
-                          fontWeight: FontWeight.bold,
-                          letterSpacing: .5,
-                        ),
+                    DropdownButtonFormField(
+                      isDense: true,
+                      isExpanded: true,
+                      borderRadius: const BorderRadius.all(Radius.circular(16)),
+                      dropdownColor: Colors.white,
+                      value: selectedCta,
+                      items: ctaList.map((region) {
+                        return DropdownMenuItem(
+                          value: region,
+                          child: Text(
+                            region,
+                            style: GoogleFonts.quicksand(
+                              textStyle: const TextStyle(
+                                fontSize: 16.0,
+                                color: Colors.black54,
+                                fontWeight: FontWeight.bold,
+                                letterSpacing: .5,
+                              ),
+                            ),
+                          ),
+                        );
+                      }).toList(),
+                      onChanged: (value) {
+                        setState(() {
+                          selectedCta = value!;
+                        });
+                      },
+                      decoration: inputDecoration(
+                        widget.userData['user_language'] == 'ro'
+                            ? 'Selectați CTA'
+                            : 'Select CTA',
                       ),
-                      decoration: inputDecoration('Story body'),
-                      onChanged: (val) {
-                        setState(() => storyBody = val.trim());
-                      },
-                      validator: (value) =>
-                          value!.length < 500 ? ('Body too short') : null,
                     ),
                     addVerticalSpace(20),
+                    const SizedBox(
+                      height: 30.0,
+                    ),
                     InkWell(
                       onTap: () {
                         FocusScope.of(context).unfocus();
                         buttonPressed(context);
                       },
-                      child: simpleButton('Submit'),
+                      child: simpleDarkRoundedButton(
+                          widget.userData['user_language'] == 'ro'
+                              ? 'Trimite'
+                              : 'Submit'),
                     ),
                     const SizedBox(
                       height: 60,
@@ -280,7 +321,9 @@ class _AddStoriesPageState extends State<AddStoriesPage> {
   void buttonPressed(BuildContext context) async {
     if (_imageFile == null) {
       snackError(
-        'Please pick an image!',
+        widget.userData['user_language'] == 'ro'
+            ? 'Vă rugăm să adăugați poza!'
+            : 'Please add the picture!',
         context,
       );
       return;
@@ -290,7 +333,9 @@ class _AddStoriesPageState extends State<AddStoriesPage> {
         loading = false;
       });
       snackError(
-        'Please fill in everything!',
+        widget.userData['user_language'] == 'ro'
+            ? 'Vă rugăm să completați totul!'
+            : 'Please fill in everything!',
         context,
       );
       return;
@@ -303,25 +348,29 @@ class _AddStoriesPageState extends State<AddStoriesPage> {
   }
 
   Future<void> _uploadImage(BuildContext context) async {
+    final DateTime now = DateTime.now();
     final String year = DateFormat('yyyy').format(now);
 
     try {
-      Reference pressStorageReference = FirebaseStorage.instance.ref().child(
-          'Stories/$year/${now.millisecondsSinceEpoch.toString()}.${_imageFile!.path.split('.').last}');
+      Reference pressStorageReference = FirebaseStorage.instance
+          .ref()
+          .child('Ads/$year/${now.millisecondsSinceEpoch.toString()}.jpg');
       UploadTask uploadTask = pressStorageReference.putFile(_imageFile!);
 
       uploadTask.whenComplete(() async {
         String url = await pressStorageReference.getDownloadURL();
 
         if (mounted) {
-          saveStory(url);
+          saveData(url);
         }
       }).catchError((onError) {
         setState(() {
           loading = false;
         });
         snackError(
-          'An error occurred, try again',
+          widget.userData['user_language'] == 'ro'
+              ? 'A apărut o eroare, încercați din nou!'
+              : 'An error occurred, try again!',
           context,
         );
       });
@@ -330,7 +379,9 @@ class _AddStoriesPageState extends State<AddStoriesPage> {
         loading = false;
       });
       snackError(
-        'An error occurred, try again',
+        widget.userData['user_language'] == 'ro'
+            ? 'A apărut o eroare, încercați din nou!'
+            : 'An error occurred, try again!',
         context,
       );
     }

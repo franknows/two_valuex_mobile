@@ -1,6 +1,5 @@
 import 'package:chat_bubbles/bubbles/bubble_special_three.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:cloud_functions/cloud_functions.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -9,22 +8,22 @@ import 'package:two_value/src/theme.dart';
 
 import '../../src/helper_widgets.dart';
 
-class CompanySupportEngagePage extends StatefulWidget {
+class AdminSupportEngagePage extends StatefulWidget {
   final String userId;
   final DocumentSnapshot userData;
-  const CompanySupportEngagePage(
-      {super.key, required this.userId, required this.userData});
+  final String customerId;
+  const AdminSupportEngagePage(
+      {super.key,
+      required this.userId,
+      required this.userData,
+      required this.customerId});
 
   @override
-  State<CompanySupportEngagePage> createState() =>
-      _CompanySupportEngagePageState();
+  State<AdminSupportEngagePage> createState() => _AdminSupportEngagePageState();
 }
 
-class _CompanySupportEngagePageState extends State<CompanySupportEngagePage> {
+class _AdminSupportEngagePageState extends State<AdminSupportEngagePage> {
   String language = '';
-  String origin = 'user_assistant';
-  final HttpsCallable callable =
-      FirebaseFunctions.instance.httpsCallable('chatGPT');
   final List<Message> _messages = [];
   final TextEditingController _textController = TextEditingController();
   int mills = DateTime.now().millisecondsSinceEpoch;
@@ -49,9 +48,9 @@ class _CompanySupportEngagePageState extends State<CompanySupportEngagePage> {
   void _getChatData(String userId) {
     FirebaseFirestore.instance
         .collection('XHelpDesk')
-        .doc(userId)
+        .doc(widget.customerId)
         .collection('Chats')
-        .where('session_time_identifier', isEqualTo: mills)
+        // .where('session_time_identifier', isEqualTo: mills)
         .orderBy('message_time', descending: true)
         .snapshots()
         .listen((QuerySnapshot snapshot) {
@@ -103,7 +102,7 @@ class _CompanySupportEngagePageState extends State<CompanySupportEngagePage> {
               ),
             ),
           ),
-          centerTitle: false,
+          centerTitle: true,
           leading: IconButton(
             icon: const Icon(
               Icons.arrow_back_ios,
@@ -113,76 +112,6 @@ class _CompanySupportEngagePageState extends State<CompanySupportEngagePage> {
               Navigator.of(context).pop();
             },
           ),
-          actions: [
-            Center(
-              child: InkWell(
-                onTap: () {
-                  if (origin == 'user_assistant') {
-                    setState(() {
-                      origin = 'user_user';
-                    });
-                    _waitingResponse(
-                        language == 'ro'
-                            ? 'Vă mulțumim că ne-ați contactat. Vă rugăm să aveți răbdare în timp ce vă conectăm la un asistent în direct care vă va ajuta în curând. Apreciem înțelegerea dvs. Vă rugăm să rețineți că închiderea chatului vă va obliga să începeți procesul de la început. Suntem angajați să vă ajutăm cât mai curând posibil.'
-                            : 'Thank you for reaching out to us. Please be patient as we connect you to a live assistant who will assist you shortly. We appreciate your understanding. Kindly note that closing the chat will require you to start the process over again. We are committed to helping you as soon as possible.',
-                        'user_user');
-                  } else {
-                    setState(() {
-                      origin = 'user_assistant';
-                    });
-                  }
-                },
-                child: origin == 'user_assistant'
-                    ? Container(
-                        height: 30,
-                        decoration: BoxDecoration(
-                            border: Border.all(
-                              color: Colors.white,
-                            ),
-                            borderRadius: const BorderRadius.all(
-                              Radius.circular(6.0),
-                            )),
-                        child: Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 8.0),
-                          child: Row(
-                            children: [
-                              const Icon(
-                                CupertinoIcons.person,
-                                size: 14,
-                              ),
-                              addHorizontalSpace(10),
-                              whiteNormalText('Chat with human')
-                            ],
-                          ),
-                        ),
-                      )
-                    : Container(
-                        height: 30,
-                        decoration: BoxDecoration(
-                            border: Border.all(
-                              color: Colors.white,
-                            ),
-                            borderRadius: const BorderRadius.all(
-                              Radius.circular(6.0),
-                            )),
-                        child: Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 8.0),
-                          child: Row(
-                            children: [
-                              const Icon(
-                                CupertinoIcons.captions_bubble,
-                                size: 14,
-                              ),
-                              addHorizontalSpace(10),
-                              whiteNormalText('Chat with bot')
-                            ],
-                          ),
-                        ),
-                      ),
-              ),
-            ),
-            addHorizontalSpace(20),
-          ],
         ),
         body: Column(
           children: <Widget>[
@@ -218,13 +147,13 @@ class _CompanySupportEngagePageState extends State<CompanySupportEngagePage> {
                   )
                 : Flexible(
                     child: ListView.builder(
-                      padding: const EdgeInsets.all(8.0),
+                      padding: EdgeInsets.all(8.0),
                       reverse: true,
                       itemCount: _messages.length,
                       itemBuilder: (_, int index) => _messages[index],
                     ),
                   ),
-            const Divider(height: 1.0),
+            Divider(height: 1.0),
             Container(
               decoration: BoxDecoration(color: Theme.of(context).cardColor),
               child: _buildTextComposer(),
@@ -249,7 +178,7 @@ class _CompanySupportEngagePageState extends State<CompanySupportEngagePage> {
             Flexible(
               child: TextField(
                 controller: _textController,
-                onSubmitted: (text) => _handleSubmitted(text, origin),
+                onSubmitted: _handleSubmitted,
                 textCapitalization: TextCapitalization.sentences,
                 maxLines: null,
                 keyboardType: TextInputType.multiline,
@@ -272,11 +201,10 @@ class _CompanySupportEngagePageState extends State<CompanySupportEngagePage> {
               ),
             ),
             Container(
-              margin: const EdgeInsets.symmetric(horizontal: 4.0),
+              margin: EdgeInsets.symmetric(horizontal: 4.0),
               child: IconButton(
-                  icon: const Icon(Icons.send),
-                  onPressed: () =>
-                      _handleSubmitted(_textController.text, origin)),
+                  icon: Icon(Icons.send),
+                  onPressed: () => _handleSubmitted(_textController.text)),
             ),
           ],
         ),
@@ -284,67 +212,25 @@ class _CompanySupportEngagePageState extends State<CompanySupportEngagePage> {
     );
   }
 
-  void _handleSubmitted(String text, String origin) async {
+  void _handleSubmitted(String text) async {
     _textController.clear();
 
     DocumentReference headsDs1 = FirebaseFirestore.instance
         .collection('XHelpDesk')
         .doc('ChatSessions')
         .collection('ChatHeads')
-        .doc(widget.userId);
-    Map<String, dynamic> _headsTask = {
+        .doc(widget.customerId);
+    Map<String, dynamic> headsTask = {
       'session_start_time': FieldValue.serverTimestamp(),
       'session_user_type': 'Company',
-      'session_user_id': widget.userId,
-      'session_assistant_id': '-',
-      'session_need_human': origin == 'user_user',
-      'session_last_message': text,
-      'session_last_sync': FieldValue.serverTimestamp(),
-      'session_id': headsDs1.id,
-    };
-    headsDs1.set(_headsTask, SetOptions(merge: true)).whenComplete(
-      () {
-        print('Chat head created');
-      },
-    );
-
-    //send customers message to database
-    DocumentReference customerMsgRef = FirebaseFirestore.instance
-        .collection('XHelpDesk')
-        .doc(widget.userId)
-        .collection('Chats')
-        .doc();
-    Map<String, dynamic> _msgTask = {
-      'message_body': text,
-      'message_id': customerMsgRef.id,
-      'message_time': FieldValue.serverTimestamp(),
-      'message_sender': widget.userId,
-      'session_time_identifier': mills,
-      'message_origin': origin,
-      'message_extra': '-',
-    };
-    customerMsgRef.set(_msgTask);
-  }
-
-  void _waitingResponse(String text, String origin) async {
-    _textController.clear();
-
-    DocumentReference headsDs1 = FirebaseFirestore.instance
-        .collection('XHelpDesk')
-        .doc('ChatSessions')
-        .collection('ChatHeads')
-        .doc(widget.userId);
-    Map<String, dynamic> _headsTask = {
-      'session_start_time': FieldValue.serverTimestamp(),
-      'session_user_type': 'Company',
-      'session_user_id': widget.userId,
+      'session_user_id': widget.customerId,
       'session_assistant_id': '-',
       'session_need_human': true,
       'session_last_message': text,
       'session_last_sync': FieldValue.serverTimestamp(),
       'session_id': headsDs1.id,
     };
-    headsDs1.set(_headsTask, SetOptions(merge: true)).whenComplete(
+    headsDs1.set(headsTask, SetOptions(merge: true)).whenComplete(
       () {
         print('Chat head created');
       },
@@ -353,19 +239,19 @@ class _CompanySupportEngagePageState extends State<CompanySupportEngagePage> {
     //send customers message to database
     DocumentReference customerMsgRef = FirebaseFirestore.instance
         .collection('XHelpDesk')
-        .doc(widget.userId)
+        .doc(widget.customerId)
         .collection('Chats')
         .doc();
-    Map<String, dynamic> _msgTask = {
+    Map<String, dynamic> msgTask = {
       'message_body': text,
       'message_id': customerMsgRef.id,
       'message_time': FieldValue.serverTimestamp(),
-      'message_sender': 'assistant',
+      'message_sender': widget.userId,
       'session_time_identifier': mills,
-      'message_origin': origin,
+      'message_origin': 'user_user',
       'message_extra': '-',
     };
-    customerMsgRef.set(_msgTask);
+    customerMsgRef.set(msgTask);
   }
 }
 

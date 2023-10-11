@@ -8,11 +8,11 @@ import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:intl/intl.dart';
+
 import '../../src/helper_widgets.dart';
 import '../../src/theme.dart';
 import '../account/delete_account_page.dart';
 import '../account/update_location_page.dart';
-import '../admin/admin_page.dart';
 import '../auth/login_screen.dart';
 import 'search_plan_page.dart';
 import 'update_images.dart';
@@ -1262,13 +1262,13 @@ class _ProfilePageState extends State<ProfilePage> {
                                         const Divider(),
                                         InkWell(
                                             onTap: () {
-                                              Navigator.push(
-                                                context,
-                                                CupertinoPageRoute(
-                                                  builder: (_) =>
-                                                      const AdminPage(),
-                                                ),
-                                              );
+                                              // Navigator.push(
+                                              //   context,
+                                              //   CupertinoPageRoute(
+                                              //     builder: (_) =>
+                                              //         const AdminPage(),
+                                              //   ),
+                                              // );
                                             },
                                             child: Padding(
                                               padding: const EdgeInsets.only(

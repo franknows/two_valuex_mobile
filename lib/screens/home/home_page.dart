@@ -9,6 +9,7 @@ import 'package:in_app_update/in_app_update.dart';
 import 'package:two_value/screens/home/company_home_page.dart';
 
 import '../../src/fcm.dart';
+import 'admin_home_page.dart';
 import 'journalist_home_page.dart';
 
 class HomePage extends StatefulWidget {
@@ -84,6 +85,11 @@ class _HomePageState extends State<HomePage> {
       );
     } else if (_userData!['account_type'] == 'Journalist') {
       return JournalistHomePage(
+        userId: widget.userId,
+        userData: _userData!,
+      );
+    } else if (_userData!['account_type'] == 'Admin') {
+      return AdminHomePage(
         userId: widget.userId,
         userData: _userData!,
       );
