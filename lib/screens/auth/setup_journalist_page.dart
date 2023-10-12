@@ -185,7 +185,7 @@ class _SetupJournalistPageState extends State<SetupJournalistPage> {
                       onChanged: (val) {
                         setState(() {
                           _errorVisibility = false;
-                          name = val.trim();
+                          bio = val.trim();
                         });
                       },
                       validator: (val) => val!.length < 50

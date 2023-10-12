@@ -275,8 +275,11 @@ class _CompanySupportEngagePageState extends State<CompanySupportEngagePage> {
               margin: const EdgeInsets.symmetric(horizontal: 4.0),
               child: IconButton(
                   icon: const Icon(Icons.send),
-                  onPressed: () =>
-                      _handleSubmitted(_textController.text, origin)),
+                  onPressed: () {
+                    if (_textController.text.isNotEmpty) {
+                      _handleSubmitted(_textController.text, origin);
+                    }
+                  }),
             ),
           ],
         ),

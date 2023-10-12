@@ -1,13 +1,13 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:carousel_slider/carousel_slider.dart';
+import 'package:chips_choice/chips_choice.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:two_value/src/helper_widgets.dart';
 import 'package:url_launcher/url_launcher.dart';
 
-import '../../src/theme.dart';
-import 'admin_single_press_view.dart';
+import 'admin_analytics_view.dart';
+import 'admin_purchases_view.dart';
 
 class AdminHomeView extends StatefulWidget {
   final String userId;
@@ -21,6 +21,17 @@ class AdminHomeView extends StatefulWidget {
 
 class _AdminHomeViewState extends State<AdminHomeView> {
   String language = '';
+  String category = 'ANALYTICS';
+  final Map<String, Map<String, String>> categoryLabels = {
+    'ro': {
+      'ANALYTICS': 'ANALITĂ',
+      'SUBSCRIPTIONS': 'ABONAMENTE',
+    },
+    'eng': {
+      'ANALYTICS': 'ANALYTICS',
+      'SUBSCRIPTIONS': 'SUBSCRIPTIONS',
+    },
+  };
 
   @override
   void initState() {
@@ -155,84 +166,57 @@ class _AdminHomeViewState extends State<AdminHomeView> {
                 );
               },
             ),
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16.0),
-              child: Column(
-                children: [
-                  addVerticalSpace(20),
-                  Row(
-                    children: [
-                      blueBodyTextLarge(
-                          language == 'ro' ? 'ACTIVITATE' : 'ACTIVITY'),
-                    ],
-                  ),
-                  addVerticalSpace(20),
-                  StreamBuilder<QuerySnapshot>(
-                    stream: FirebaseFirestore.instance
-                        .collection('XArticles')
-                        .doc('Presses')
-                        .collection('Dominant')
-                        .where('press_poster', isEqualTo: widget.userId)
-                        .orderBy('press_time', descending: true)
-                        .limit(10)
-                        .snapshots(),
-                    builder: (context, snapshot) {
-                      if (!snapshot.hasData) {
-                        return SizedBox(
-                          height: size.height - 300,
-                          child: Center(
-                            child: CircularProgressIndicator(
-                              strokeWidth: 4,
-                              color: TAppTheme.primaryColor.withOpacity(.4),
-                              backgroundColor: Colors.white,
-                            ),
-                          ),
+            SizedBox(
+              width: double.infinity,
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    ChipsChoice<String>.single(
+                      value: category,
+                      onChanged: (val) {
+                        setState(() {
+                          category = val;
+                        });
+                      },
+                      choiceItems: C2Choice.listFrom<String, String>(
+                        source: categoryLabels[language]!.keys.toList(),
+                        value: (i, v) => v,
+                        label: (i, v) => categoryLabels[language]![v]!,
+                      ),
+                      choiceBuilder: (item, index) {
+                        return ChoiceChip(
+                          label: category == item.value
+                              ? whiteChipText(item.label)
+                              : blackChipText(item.label),
+                          selected: category == item.value,
+                          onSelected: (selected) {
+                            setState(() {
+                              category = item.value;
+                            });
+                          },
+                          selectedColor: Colors
+                              .blueGrey, // The background color for selected items
+                          backgroundColor: Colors.grey[
+                              300], // The background color for non-selected items
+                          padding: EdgeInsets.symmetric(horizontal: 10),
                         );
-                      } else {
-                        if (snapshot.data!.docs.isEmpty) {
-                          return Column(
-                            children: [
-                              addVerticalSpace(200),
-                              const Center(
-                                child: Image(
-                                  height: 200,
-                                  image: AssetImage(
-                                      'assets/images/empty_list.png'),
-                                ),
-                              ),
-                            ],
-                          );
-                        } else {
-                          return ListView.builder(
-                            shrinkWrap: true,
-                            physics: const NeverScrollableScrollPhysics(),
-                            itemCount: snapshot.data!.docs.length,
-                            itemBuilder: (context, index) {
-                              DocumentSnapshot doc = snapshot.data!.docs[index];
-                              return InkWell(
-                                onTap: () {
-                                  Navigator.push(
-                                    context,
-                                    CupertinoPageRoute(
-                                      builder: (_) => AdminSinglePressView(
-                                        userId: widget.userId,
-                                        userData: widget.userData,
-                                        pressData: doc,
-                                      ),
-                                    ),
-                                  );
-                                },
-                                child: pressItem(doc),
-                              );
-                            },
-                          );
-                        }
-                      }
-                    },
-                  ),
-                ],
+                      },
+                      wrapped: true,
+                      wrapCrossAlignment: WrapCrossAlignment.start,
+                      alignment: WrapAlignment.start,
+                      runAlignment: WrapAlignment.start,
+                      padding: EdgeInsets.zero,
+                      spacing: 10,
+                      runSpacing: 0,
+                    ),
+                  ],
+                ),
               ),
             ),
+            decideView(),
+            addVerticalSpace(40),
           ],
         ),
       ),
@@ -243,6 +227,25 @@ class _AdminHomeViewState extends State<AdminHomeView> {
     if (!await launchUrl(Uri.parse(url),
         mode: LaunchMode.externalApplication)) {
       throw Exception('Could not launch $url');
+    }
+  }
+
+  Widget decideView() {
+    if (category == 'ANALYTICS') {
+      return AdminAnalyticsView(
+        userId: widget.userId,
+        userData: widget.userData,
+      );
+    } else if (category == 'SUBSCRIPTIONS') {
+      return AdminPurchasesView(
+        userId: widget.userId,
+        userData: widget.userData,
+      );
+    } else {
+      return AdminAnalyticsView(
+        userId: widget.userId,
+        userData: widget.userData,
+      );
     }
   }
 }

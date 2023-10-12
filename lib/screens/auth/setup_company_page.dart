@@ -33,6 +33,7 @@ class _SetupCompanyPageState extends State<SetupCompanyPage> {
   String userTown = '';
   String userAddress = '';
   String userPhone = '';
+  String userDesc = '';
   String email = '';
   String password = '';
   bool _passwordVisible = false;
@@ -256,6 +257,36 @@ class _SetupCompanyPageState extends State<SetupCompanyPage> {
                     ),
                     addVerticalSpace(20.0),
                     TextFormField(
+                      enabled: true,
+                      maxLines: null,
+                      keyboardType: TextInputType.text,
+                      textCapitalization: TextCapitalization.sentences,
+                      style: GoogleFonts.quicksand(
+                        textStyle: const TextStyle(
+                          fontSize: 18.0,
+                          color: Colors.black54,
+                          letterSpacing: .5,
+                        ),
+                      ),
+                      decoration: inputDecoration(
+                        language == 'ro'
+                            ? 'Descrierea companiei'
+                            : 'Company decription',
+                      ),
+                      onChanged: (val) {
+                        setState(() {
+                          _errorVisibility = false;
+                          userDesc = val.trim();
+                        });
+                      },
+                      validator: (val) => val!.length < 3
+                          ? (language == 'ro'
+                              ? 'Introduceți o descriere'
+                              : 'Enter a description')
+                          : null,
+                    ),
+                    addVerticalSpace(20.0),
+                    TextFormField(
                       initialValue: email,
                       enabled: false,
                       keyboardType: TextInputType.text,
@@ -335,7 +366,7 @@ class _SetupCompanyPageState extends State<SetupCompanyPage> {
       'personal_position_in_company': '-',
       'registration_number': registrationNo,
       'user_address': userAddress,
-      'about_user': '',
+      'about_user': userDesc,
       'external_link': '',
       'user_verification': false,
       'subscriptions_count': 0,

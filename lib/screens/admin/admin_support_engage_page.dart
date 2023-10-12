@@ -67,7 +67,9 @@ class _AdminSupportEngagePageState extends State<AdminSupportEngagePage> {
             final messageSender = doc['message_sender'];
             final messageType = messageSender == widget.userId
                 ? MessageType.user
-                : MessageType.bot;
+                : messageSender == 'assistant'
+                    ? MessageType.bot
+                    : MessageType.other;
 
             _messages.add(Message(text: messageContent, type: messageType));
           }
@@ -102,7 +104,7 @@ class _AdminSupportEngagePageState extends State<AdminSupportEngagePage> {
               ),
             ),
           ),
-          centerTitle: true,
+          centerTitle: false,
           leading: IconButton(
             icon: const Icon(
               Icons.arrow_back_ios,
@@ -112,6 +114,53 @@ class _AdminSupportEngagePageState extends State<AdminSupportEngagePage> {
               Navigator.of(context).pop();
             },
           ),
+          actions: [
+            Center(
+              child: InkWell(
+                onTap: () {
+                  DocumentReference headsDs1 = FirebaseFirestore.instance
+                      .collection('XHelpDesk')
+                      .doc('ChatSessions')
+                      .collection('ChatHeads')
+                      .doc(widget.customerId);
+                  Map<String, dynamic> headsTask = {
+                    'session_need_human': false,
+                  };
+                  headsDs1.update(headsTask).whenComplete(
+                    () {
+                      print('Session ended');
+                    },
+                  );
+
+                  Navigator.of(context).pop();
+                },
+                child: Container(
+                  height: 30,
+                  decoration: BoxDecoration(
+                      border: Border.all(
+                        color: Colors.white,
+                      ),
+                      borderRadius: const BorderRadius.all(
+                        Radius.circular(6.0),
+                      )),
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                    child: Row(
+                      children: [
+                        const Icon(
+                          CupertinoIcons.xmark_square,
+                          size: 14,
+                        ),
+                        addHorizontalSpace(10),
+                        whiteNormalText('End session')
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+            ),
+            addHorizontalSpace(20),
+          ],
         ),
         body: Column(
           children: <Widget>[
@@ -204,7 +253,11 @@ class _AdminSupportEngagePageState extends State<AdminSupportEngagePage> {
               margin: EdgeInsets.symmetric(horizontal: 4.0),
               child: IconButton(
                   icon: Icon(Icons.send),
-                  onPressed: () => _handleSubmitted(_textController.text)),
+                  onPressed: () {
+                    if (_textController.text.isNotEmpty) {
+                      _handleSubmitted(_textController.text);
+                    }
+                  }),
             ),
           ],
         ),
@@ -255,7 +308,7 @@ class _AdminSupportEngagePageState extends State<AdminSupportEngagePage> {
   }
 }
 
-enum MessageType { user, bot }
+enum MessageType { user, bot, other }
 
 class Message extends StatelessWidget {
   final String text;
@@ -270,26 +323,38 @@ class Message extends StatelessWidget {
       child: type == MessageType.user
           ? BubbleSpecialThree(
               text: text,
-              color: const Color(0xFF1B97F3),
+              color: const Color(0xFFb6d7a8),
               tail: true,
               isSender: true,
-              textStyle: GoogleFonts.quicksand(
-                color: Colors.white,
-                fontSize: 14,
-                letterSpacing: .5,
-              ),
-            )
-          : BubbleSpecialThree(
-              text: text,
-              color: const Color(0xFFE8E8EE),
-              tail: true,
-              isSender: false,
               textStyle: GoogleFonts.quicksand(
                 color: Colors.black87,
                 fontSize: 14,
                 letterSpacing: .5,
               ),
-            ),
+            )
+          : type == MessageType.other
+              ? BubbleSpecialThree(
+                  text: text,
+                  color: const Color(0xFFdaf2fb),
+                  tail: true,
+                  isSender: false,
+                  textStyle: GoogleFonts.quicksand(
+                    color: Colors.black87,
+                    fontSize: 14,
+                    letterSpacing: .5,
+                  ),
+                )
+              : BubbleSpecialThree(
+                  text: text,
+                  color: const Color(0xFFE8E8EE),
+                  tail: true,
+                  isSender: false,
+                  textStyle: GoogleFonts.quicksand(
+                    color: Colors.black87,
+                    fontSize: 14,
+                    letterSpacing: .5,
+                  ),
+                ),
     );
   }
 }

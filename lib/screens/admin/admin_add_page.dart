@@ -7,6 +7,7 @@ import 'package:two_value/screens/company/company_add_press_release_page.dart';
 import '../../src/helper_widgets.dart';
 import 'admin_add_ad_page.dart';
 import 'admin_add_interview_page.dart';
+import 'admin_add_job_page.dart';
 
 class AdminAddPage extends StatefulWidget {
   final String userId;
@@ -94,7 +95,7 @@ class _AdminAddPageState extends State<AdminAddPage> {
                           ),
                         ),
                         addVerticalSpace(10),
-                        dialogTitleText(
+                        blackNormalCenteredText(
                           language == 'ro'
                               ? 'Comunicat de presă'
                               : 'Press release',
@@ -136,7 +137,7 @@ class _AdminAddPageState extends State<AdminAddPage> {
                           ),
                         ),
                         addVerticalSpace(10),
-                        blackBoldText(
+                        blackNormalCenteredText(
                           language == 'ro' ? 'Interviu' : 'Interview',
                         ),
                         addVerticalSpace(2.0),
@@ -176,7 +177,7 @@ class _AdminAddPageState extends State<AdminAddPage> {
                           ),
                         ),
                         addVerticalSpace(10),
-                        blackBoldText(
+                        blackNormalCenteredText(
                           language == 'ro'
                               ? 'Agenda evenimentului'
                               : 'Event Agenda',
@@ -218,11 +219,56 @@ class _AdminAddPageState extends State<AdminAddPage> {
                           ),
                         ),
                         addVerticalSpace(10),
-                        blackBoldText(
+                        blackNormalCenteredText(
                           language == 'ro' ? 'Postați un anunț' : 'Post an Ad',
                         ),
                         addVerticalSpace(2.0),
                       ],
+                    ),
+                  ),
+                ),
+                GestureDetector(
+                  onTap: () {
+                    Navigator.push(
+                      context,
+                      CupertinoPageRoute(
+                        builder: (_) => AdminAddJobPage(
+                          userId: widget.userId,
+                          userData: widget.userData,
+                        ),
+                      ),
+                    );
+                  },
+                  child: Card(
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(10.0),
+                    ),
+                    elevation: .5,
+                    color: Colors.white,
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        children: [
+                          const CircleAvatar(
+                            radius: 30,
+                            backgroundColor: Colors.black12,
+                            child: Image(
+                              image: AssetImage('assets/icons/job.png'),
+                              height: 24,
+                              width: 24,
+                            ),
+                          ),
+                          addVerticalSpace(10),
+                          blackNormalCenteredText(
+                            language == 'ro'
+                                ? 'Posteaza un loc de munca'
+                                : 'Post a job',
+                          ),
+                          addVerticalSpace(2.0),
+                        ],
+                      ),
                     ),
                   ),
                 ),

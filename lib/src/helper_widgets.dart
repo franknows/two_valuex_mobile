@@ -9,6 +9,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
 
 import 'theme.dart';
+import 'time_ago_eng.dart';
 
 Widget addVerticalSpace(double height) {
   return SizedBox(
@@ -152,9 +153,22 @@ Widget blueBodyTextLarge(String text) {
   return Text(
     text,
     style: GoogleFonts.quicksand(
-      color: TAppTheme.primaryColor,
+      color: TAppTheme.darkBlue,
       fontWeight: FontWeight.bold,
       fontSize: 16,
+      letterSpacing: .5,
+    ),
+    textAlign: TextAlign.start,
+  );
+}
+
+Widget blueBodyTextWithSize(String text, double size) {
+  return Text(
+    text,
+    style: GoogleFonts.quicksand(
+      color: TAppTheme.darkBlue,
+      fontWeight: FontWeight.bold,
+      fontSize: size,
       letterSpacing: .5,
     ),
     textAlign: TextAlign.start,
@@ -1946,6 +1960,293 @@ pressPublicItem(DocumentSnapshot doc) {
   );
 }
 
+jobPublicItem(DocumentSnapshot doc) {
+  return Padding(
+    padding: const EdgeInsets.only(bottom: 12.0),
+    child: Container(
+      decoration: const BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.all(
+          Radius.circular(10),
+        ),
+      ),
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 16.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            addVerticalSpace(16),
+            Row(
+              children: [
+                ClipRRect(
+                  borderRadius: BorderRadius.circular(10.0),
+                  child: SizedBox(
+                    height: 50,
+                    width: 50,
+                    child: CachedNetworkImage(
+                      imageUrl: doc['job_employer_logo'],
+                      placeholder: (context, url) => Image.asset(
+                        'assets/images/vertical_placeholder.png',
+                        fit: BoxFit.cover,
+                      ),
+                      errorWidget: (context, url, error) => Image.asset(
+                        'assets/images/vertical_placeholder.png',
+                        fit: BoxFit.cover,
+                      ),
+                      fit: BoxFit.cover,
+                    ),
+                  ),
+                ),
+                addHorizontalSpace(20),
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      doc['job_employer_name'],
+                      style: GoogleFonts.quicksand(
+                        fontSize: 14,
+                        color: Colors.black87,
+                        fontWeight: FontWeight.bold,
+                        letterSpacing: .5,
+                      ),
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                    addVerticalSpace(4),
+                    miniBlackText(timeAgoEn(doc['job_posted_mills']))
+                  ],
+                ),
+              ],
+            ),
+            addVerticalSpace(10),
+            Text(
+              doc['job_title'].toString().toUpperCase(),
+              style: GoogleFonts.quicksand(
+                fontSize: 14,
+                color: Colors.black54,
+                fontWeight: FontWeight.bold,
+                letterSpacing: .5,
+              ),
+              maxLines: 2,
+              overflow: TextOverflow.ellipsis,
+            ),
+            addVerticalSpace(4.0),
+            Text(
+              doc['job_description'],
+              style: GoogleFonts.quicksand(
+                fontSize: 14,
+                color: Colors.black54,
+                letterSpacing: .5,
+              ),
+              maxLines: 4,
+              overflow: TextOverflow.ellipsis,
+            ),
+            addVerticalSpace(20.0),
+          ],
+        ),
+      ),
+    ),
+  );
+}
+
+companyPublicItem(DocumentSnapshot doc) {
+  return Container(
+    decoration: const BoxDecoration(
+      color: Colors.white,
+      borderRadius: BorderRadius.all(
+        Radius.circular(10),
+      ),
+    ),
+    child: Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 16.0),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: [
+          addVerticalSpace(20),
+          CircleAvatar(
+            radius: 40, // Adjust this for your desired circle size
+            backgroundColor: Colors.transparent,
+            backgroundImage: CachedNetworkImageProvider(
+              doc['user_image'] == '-'
+                  ? 'https://firebasestorage.googleapis.com/v0/b/two-value.appspot.com/o/XHolder%2Fbusiness_holder.png?alt=media&token=ba7b88f0-08ad-439a-b988-b923099ccab9'
+                  : doc['user_image'],
+            ),
+          ),
+          addVerticalSpace(10),
+          Text(
+            doc['user_name'].toString().toUpperCase(),
+            style: GoogleFonts.quicksand(
+              fontSize: 14,
+              color: Colors.black54,
+              fontWeight: FontWeight.bold,
+              letterSpacing: .5,
+            ),
+            maxLines: 2,
+            overflow: TextOverflow.ellipsis,
+            textAlign: TextAlign.center,
+          ),
+          addVerticalSpace(10.0),
+          Container(
+            decoration: BoxDecoration(
+              color: Colors.grey.withOpacity(.7),
+              borderRadius: BorderRadius.all(
+                Radius.circular(6.0),
+              ),
+            ),
+            child: Padding(
+              padding: const EdgeInsets.symmetric(
+                horizontal: 16,
+                vertical: 3,
+              ),
+              child: Text(
+                doc['user_plan'] == '-' ? 'DEMO' : doc['user_plan'],
+                style: GoogleFonts.quicksand(
+                  textStyle: const TextStyle(
+                    fontSize: 12,
+                    color: Colors.white,
+                    letterSpacing: .5,
+                  ),
+                ),
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+              ),
+            ),
+          ),
+          addVerticalSpace(4.0),
+        ],
+      ),
+    ),
+  );
+}
+
+journalistPublicItem(DocumentSnapshot doc) {
+  return Container(
+    decoration: const BoxDecoration(
+      color: Colors.white,
+      borderRadius: BorderRadius.all(
+        Radius.circular(10),
+      ),
+    ),
+    child: Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 16.0),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: [
+          addVerticalSpace(20),
+          CircleAvatar(
+            radius: 40, // Adjust this for your desired circle size
+            backgroundColor: Colors.transparent,
+            backgroundImage: CachedNetworkImageProvider(
+              doc['user_image'] == '-'
+                  ? 'https://firebasestorage.googleapis.com/v0/b/two-value.appspot.com/o/XHolder%2Fp_holder.jpg?alt=media&token=75847331-c10f-483f-ac3c-6d3a84725c62'
+                  : doc['user_image'],
+            ),
+          ),
+          addVerticalSpace(10),
+          Text(
+            doc['user_name'].toString().toUpperCase(),
+            style: GoogleFonts.quicksand(
+              fontSize: 14,
+              color: Colors.black54,
+              fontWeight: FontWeight.bold,
+              letterSpacing: .5,
+            ),
+            maxLines: 2,
+            overflow: TextOverflow.ellipsis,
+            textAlign: TextAlign.center,
+          ),
+          addVerticalSpace(10.0),
+          doc['make_money'] == '-'
+              ? Container()
+              : Container(
+                  decoration: BoxDecoration(
+                    color: Colors.blueGrey.withOpacity(.7),
+                    borderRadius: BorderRadius.all(
+                      Radius.circular(6.0),
+                    ),
+                  ),
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 16,
+                      vertical: 3,
+                    ),
+                    child: Text(
+                      'PRO',
+                      style: GoogleFonts.quicksand(
+                        textStyle: const TextStyle(
+                          fontSize: 12,
+                          color: Colors.white,
+                          letterSpacing: .5,
+                        ),
+                      ),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ),
+                ),
+          addVerticalSpace(4.0),
+        ],
+      ),
+    ),
+  );
+}
+
+contactPublicItem(DocumentSnapshot doc) {
+  return Padding(
+    padding: const EdgeInsets.only(bottom: 10.0),
+    child: Container(
+      decoration: const BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.all(
+          Radius.circular(10),
+        ),
+      ),
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 16.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            addVerticalSpace(10),
+            Text(
+              doc['name'].toString().toUpperCase(),
+              style: GoogleFonts.quicksand(
+                fontSize: 14,
+                color: Colors.black54,
+                fontWeight: FontWeight.bold,
+                letterSpacing: .5,
+              ),
+              maxLines: 2,
+              overflow: TextOverflow.ellipsis,
+            ),
+            addVerticalSpace(4.0),
+            Row(
+              children: [
+                Icon(
+                  CupertinoIcons.envelope_fill,
+                  size: 14,
+                  color: Colors.grey,
+                ),
+                addHorizontalSpace(10),
+                Text(
+                  doc['email'],
+                  style: GoogleFonts.quicksand(
+                    fontSize: 14,
+                    color: Colors.black54,
+                    letterSpacing: .5,
+                  ),
+                  maxLines: 4,
+                  overflow: TextOverflow.ellipsis,
+                ),
+              ],
+            ),
+            addVerticalSpace(10.0),
+          ],
+        ),
+      ),
+    ),
+  );
+}
+
 eventPublicItem(DocumentSnapshot doc, String userId) {
   return Padding(
     padding: const EdgeInsets.only(bottom: 12.0),
@@ -2227,6 +2528,49 @@ class CustomTextFormField extends StatelessWidget {
       //   icon: icon != null ? Icon(icon) : null,
       //   // ... you can customize other decoration properties
       // ),
+    );
+  }
+}
+
+class Indicator extends StatelessWidget {
+  const Indicator({
+    super.key,
+    required this.color,
+    required this.text,
+    required this.isSquare,
+    this.size = 16,
+    this.textColor,
+  });
+  final Color color;
+  final String text;
+  final bool isSquare;
+  final double size;
+  final Color? textColor;
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      children: <Widget>[
+        Container(
+          width: size,
+          height: size,
+          decoration: BoxDecoration(
+            shape: isSquare ? BoxShape.rectangle : BoxShape.circle,
+            color: color,
+          ),
+        ),
+        const SizedBox(
+          width: 4,
+        ),
+        Text(
+          text,
+          style: TextStyle(
+            fontSize: 16,
+            fontWeight: FontWeight.bold,
+            color: textColor,
+          ),
+        )
+      ],
     );
   }
 }

@@ -9,11 +9,11 @@ import 'package:two_value/src/theme.dart';
 import '../../src/helper_widgets.dart';
 import '../admin/admin_add_page.dart';
 import '../admin/admin_home_view.dart';
+import '../admin/admin_manage_view.dart';
 import '../admin/admin_news_page.dart';
 import '../admin/admin_notification_page.dart';
 import '../admin/admin_profile_page.dart';
 import '../admin/admin_support_page.dart';
-import '../admin/admin_task_view.dart';
 
 class AdminHomePage extends StatefulWidget {
   final String userId;
@@ -73,16 +73,30 @@ class _AdminHomePageState extends State<AdminHomePage> {
           backgroundColor: Colors.white,
           appBar: AppBar(
             backgroundColor: TAppTheme.primaryColor,
-            elevation: 8,
-            title: const Row(
+            elevation: 4,
+            title: Row(
+              crossAxisAlignment: CrossAxisAlignment.end,
               children: [
-                Image(
-                  height: 18,
+                const Image(
+                  height: 20,
                   fit: BoxFit.cover,
                   image: AssetImage(
                     'assets/images/nav_logo.png',
                   ),
                 ),
+                addHorizontalSpace(10),
+                const CircleAvatar(
+                  radius: 8,
+                  backgroundColor: Colors.white30,
+                  child: CircleAvatar(
+                    radius: 5,
+                    backgroundColor: Colors.white54,
+                    child: CircleAvatar(
+                      radius: 2.5,
+                      backgroundColor: TAppTheme.accentColor,
+                    ),
+                  ),
+                )
               ],
             ),
             actions: <Widget>[
@@ -195,7 +209,7 @@ class _AdminHomePageState extends State<AdminHomePage> {
               /// Likes
               SalomonBottomBarItem(
                 icon: Image(
-                  image: const AssetImage('assets/icons/add.png'),
+                  image: const AssetImage('assets/icons/admin_add.png'),
                   height: 20,
                   width: 20,
                   color: _currentIndex == 2 ? Colors.teal : Colors.black,
@@ -222,8 +236,8 @@ class _AdminHomePageState extends State<AdminHomePage> {
                 ),
                 title: Text(
                   widget.userData['user_language'] == 'ro'
-                      ? 'Sarcini'
-                      : 'Tasks',
+                      ? 'Administra'
+                      : 'Manage',
                   style: GoogleFonts.quicksand(
                     textStyle: const TextStyle(
                       fontSize: 14.0,
@@ -279,7 +293,7 @@ class _AdminHomePageState extends State<AdminHomePage> {
         userData: widget.userData,
       );
     } else if (_currentIndex == 3) {
-      return AdminTaskView(
+      return AdminManageView(
         userId: widget.userId,
         userData: widget.userData,
       );
