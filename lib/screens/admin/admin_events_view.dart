@@ -140,10 +140,10 @@ class _AdminEventsViewState extends State<AdminEventsView> {
                     Row(
                       children: [
                         Container(
-                          height: 70,
+                          height: 60,
                           width: 50,
                           decoration: BoxDecoration(
-                            color: TAppTheme.darkBlue.withOpacity(.4),
+                            color: TAppTheme.darkBlue.withOpacity(.2),
                             borderRadius: const BorderRadius.all(
                               Radius.circular(10),
                             ),

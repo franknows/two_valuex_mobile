@@ -175,6 +175,31 @@ Widget blueBodyTextWithSize(String text, double size) {
   );
 }
 
+Widget blueGreyBoldTextWithSize(String text, double size) {
+  return Text(
+    text,
+    style: GoogleFonts.quicksand(
+      color: Colors.blueGrey,
+      fontWeight: FontWeight.bold,
+      fontSize: size,
+      letterSpacing: .5,
+    ),
+    textAlign: TextAlign.start,
+  );
+}
+
+Widget blueGreyNormalTextWithSize(String text, double size) {
+  return Text(
+    text,
+    style: GoogleFonts.quicksand(
+      color: Colors.blueGrey,
+      fontSize: size,
+      letterSpacing: .5,
+    ),
+    textAlign: TextAlign.start,
+  );
+}
+
 blackNormalText(String txt) {
   return Text(
     txt,
