@@ -20,98 +20,84 @@ class AdminCompaniesView extends StatefulWidget {
 
 class _AdminCompaniesViewState extends State<AdminCompaniesView> {
   String language = '';
-  DocumentSnapshot? _lastDocument;
-  List<DocumentSnapshot> _allDocs = [];
-  int _limit = 10;
-
-  Stream<QuerySnapshot> _getStream() {
-    Query query = FirebaseFirestore.instance
-        .collection('XUsers')
-        .where('account_type', isEqualTo: 'Company')
-        .orderBy('creation_date', descending: true)
-        .limit(_limit);
-
-    if (_lastDocument != null) {
-      query = query.startAfterDocument(_lastDocument!);
-    }
-
-    return query.snapshots();
-  }
+  int _limit = 20; // Initial limit, change as needed
+  int total = 20;
+  QuerySnapshot? query;
 
   @override
   void initState() {
     // TODO: implement initState
     super.initState();
+    _getCompanies(_limit);
     setState(() {
       language = widget.userData['user_language'];
+    });
+  }
+
+  void _getCompanies(int limit) {
+    FirebaseFirestore.instance
+        .collection('XUsers')
+        .where('account_type', isEqualTo: 'Company')
+        .orderBy('creation_date', descending: true)
+        .limit(limit)
+        .snapshots()
+        .listen((QuerySnapshot snapshot) {
+      setState(() {
+        query = snapshot;
+        total = snapshot.size;
+      });
     });
   }
 
   @override
   Widget build(BuildContext context) {
     var size = MediaQuery.of(context).size;
-    return StreamBuilder<QuerySnapshot>(
-      stream: _getStream(),
-      builder: (context, snapshot) {
-        if (!snapshot.hasData) {
-          return SizedBox(
-            height: size.height - 300,
-            child: Center(
-              child: CircularProgressIndicator(
-                strokeWidth: 4,
-                color: TAppTheme.primaryColor.withOpacity(.4),
-                backgroundColor: Colors.white,
+    if (query == null) {
+      return SizedBox(
+        height: size.height - 300,
+        child: Center(
+          child: CircularProgressIndicator(
+            strokeWidth: 4,
+            color: TAppTheme.primaryColor.withOpacity(.4),
+            backgroundColor: Colors.white,
+          ),
+        ),
+      );
+    } else {
+      if (query!.size == 0) {
+        return Column(
+          children: [
+            addVerticalSpace(200),
+            const Center(
+              child: Image(
+                height: 200,
+                image: AssetImage('assets/images/empty_list.png'),
               ),
             ),
-          );
-        } else {
-          if (snapshot.data!.docs.isEmpty) {
-            return Column(
+          ],
+        );
+      } else {
+        return Flexible(
+          child: SingleChildScrollView(
+            child: Column(
               children: [
-                addVerticalSpace(200),
-                const Center(
-                  child: Image(
-                    height: 200,
-                    image: AssetImage('assets/images/empty_list.png'),
-                  ),
-                ),
-              ],
-            );
-          } else {
-            _allDocs.addAll(snapshot.data!.docs);
-            if (snapshot.data!.docs.isNotEmpty) {
-              _lastDocument = snapshot.data!.docs.last;
-            }
-            return NotificationListener<ScrollNotification>(
-              onNotification: (scrollInfo) {
-                // print(scrollInfo.metrics.pixels);
-                if (scrollInfo.metrics.pixels ==
-                    scrollInfo.metrics.maxScrollExtent) {
-                  _limit += 10; // Add 10 more items
-
-                  setState(
-                      () {}); // This will trigger the StreamBuilder to rebuild with the new _limit
-                }
-                return false;
-              },
-              child: Flexible(
-                child: GridView.builder(
+                GridView.builder(
                   padding: const EdgeInsets.only(
-                    bottom: 40,
+                    bottom: 20,
                     left: 16,
                     right: 16,
                     top: 10,
                   ),
                   shrinkWrap: true,
-                  // physics: const NeverScrollableScrollPhysics(),
-                  itemCount: snapshot.data!.docs.length,
+                  physics: const NeverScrollableScrollPhysics(),
+                  itemCount: query!.size,
                   gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
                     crossAxisCount: 2,
                     crossAxisSpacing: 14.0, // Spacing between items in a row
                     mainAxisSpacing: 14.0, // Spacing between rows
                   ),
                   itemBuilder: (context, index) {
-                    DocumentSnapshot doc = snapshot.data!.docs[index];
+                    DocumentSnapshot doc = query!.docs[index];
                     return GestureDetector(
                       onTap: () {
                         _showBottomSheet(context, doc);
@@ -120,12 +106,28 @@ class _AdminCompaniesViewState extends State<AdminCompaniesView> {
                     );
                   },
                 ),
-              ),
-            );
-          }
-        }
-      },
-    );
+                if (_limit <= total)
+                  SizedBox(
+                    width: 200,
+                    child: GestureDetector(
+                      onTap: () {
+                        _getCompanies(_limit + 20);
+                        setState(() {
+                          _limit += 20; // Add 10 more items
+                        });
+                      },
+                      child: tealButton(
+                        language == 'ro' ? 'Incarca mai mult' : 'Load More',
+                      ),
+                    ),
+                  ),
+                addVerticalSpace(20),
+              ],
+            ),
+          ),
+        );
+      }
+    }
   }
 
   void _showBottomSheet(BuildContext context, DocumentSnapshot doc) {

@@ -62,7 +62,7 @@ class _CompanyAddAdPageState extends State<CompanyAddAdPage> {
       'ad_id': ds.id,
       'ad_poster': widget.userId,
       'ad_clicks_count': 0,
-      'ad_visibility': true,
+      'ad_visibility': false,
       'ad_cta': selectedCta,
       'ad_visible_areas': FieldValue.arrayUnion(['-']),
       'ad_posted_time': FieldValue.serverTimestamp(),

@@ -192,7 +192,7 @@ class _CompanyHomeViewState extends State<CompanyHomeView> {
                         if (snapshot.data!.docs.isEmpty) {
                           return Column(
                             children: [
-                              addVerticalSpace(200),
+                              addVerticalSpace(30),
                               const Center(
                                 child: Image(
                                   height: 200,

@@ -60,7 +60,7 @@ class _CompanyAddEventPageState extends State<CompanyAddEventPage> {
       'event_clicks_count': 0,
       'event_date': Timestamp.fromDate(eventDate),
       'event_author': widget.userData['user_name'],
-      'event_visibility': true,
+      'event_visibility': false,
       'event_visible_areas': FieldValue.arrayUnion(['-']),
       'event_interested_users': FieldValue.arrayUnion([widget.userId]),
       'event_posted_time': FieldValue.serverTimestamp(),

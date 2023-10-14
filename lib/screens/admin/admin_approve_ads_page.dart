@@ -2,9 +2,7 @@ import 'package:any_link_preview/any_link_preview.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_chat_types/flutter_chat_types.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:intl/intl.dart';
 import 'package:two_value/src/time_ago_eng.dart';
 import 'package:url_launcher/url_launcher.dart';
 
@@ -135,9 +133,6 @@ class _AdminApproveAdsPageState extends State<AdminApproveAdsPage> {
   }
 
   void _showBottomSheet(BuildContext context, DocumentSnapshot doc) {
-    Map<String, PreviewData> datas = {};
-
-    List<String> urls = [doc['event_link']];
     var size = MediaQuery.of(context).size;
     showModalBottomSheet(
       context: context,
@@ -164,7 +159,7 @@ class _AdminApproveAdsPageState extends State<AdminApproveAdsPage> {
                       child: AspectRatio(
                         aspectRatio: 16 / 9,
                         child: CachedNetworkImage(
-                          imageUrl: doc['event_image'],
+                          imageUrl: doc['ad_image'],
                           placeholder: (context, url) => Image.asset(
                             'assets/images/vertical_placeholder.png',
                             fit: BoxFit.cover,
@@ -177,86 +172,24 @@ class _AdminApproveAdsPageState extends State<AdminApproveAdsPage> {
                         ),
                       ),
                     ),
-                    addVerticalSpace(10),
-                    Row(
-                      children: [
-                        Container(
-                          height: 60,
-                          width: 50,
-                          decoration: BoxDecoration(
-                            color: TAppTheme.darkBlue.withOpacity(.2),
-                            borderRadius: const BorderRadius.all(
-                              Radius.circular(10),
-                            ),
-                          ),
-                          child: Column(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              blueBodyTextLarge(
-                                doc['event_date'] == null
-                                    ? '-'
-                                    : DateFormat('MMM').format(
-                                        DateTime.parse(
-                                          doc['event_date'].toDate().toString(),
-                                        ),
-                                      ),
-                              ),
-                              blueBodyTextWithSize(
-                                  doc['event_date'] == null
-                                      ? '-'
-                                      : DateFormat('dd').format(
-                                          DateTime.parse(
-                                            doc['event_date']
-                                                .toDate()
-                                                .toString(),
-                                          ),
-                                        ),
-                                  24),
-                            ],
-                          ),
-                        ),
-                        addHorizontalSpace(20),
-                        Flexible(
-                          child: Text(
-                            doc['event_title'].toString().toUpperCase(),
-                            style: GoogleFonts.quicksand(
-                              fontSize: 14,
-                              color: Colors.black54,
-                              fontWeight: FontWeight.bold,
-                              letterSpacing: .5,
-                            ),
-                            maxLines: 3,
-                            overflow: TextOverflow.ellipsis,
-                          ),
-                        ),
-                      ],
+                    addVerticalSpace(10.0),
+                    blackBoldText(doc['ad_cta'].toString().toUpperCase()),
+                    addVerticalSpace(4.0),
+                    Text(
+                      doc['ad_description'],
+                      style: GoogleFonts.quicksand(
+                        fontSize: 14,
+                        color: Colors.black54,
+                        letterSpacing: .5,
+                      ),
+                      // overflow: TextOverflow.ellipsis,
                     ),
                     addVerticalSpace(4.0),
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        Row(
-                          children: [
-                            Icon(
-                              Icons.business,
-                              color: Colors.blueGrey.withOpacity(.5),
-                              size: 14,
-                            ),
-                            addHorizontalSpace(10),
-                            Text(
-                              capitalize(doc['event_author']),
-                              style: GoogleFonts.quicksand(
-                                fontSize: 12,
-                                color: Colors.blueGrey.withOpacity(.5),
-                                letterSpacing: .5,
-                              ),
-                              maxLines: 2,
-                              overflow: TextOverflow.ellipsis,
-                            ),
-                          ],
-                        ),
                         Text(
-                          timeAgoEn(doc['event_posted_mills']),
+                          timeAgoEn(doc['ad_posted_mills']),
                           style: GoogleFonts.quicksand(
                             textStyle: TextStyle(
                               fontSize: 12.0,
@@ -266,19 +199,9 @@ class _AdminApproveAdsPageState extends State<AdminApproveAdsPage> {
                         ),
                       ],
                     ),
-                    addVerticalSpace(4.0),
-                    Text(
-                      doc['event_description'],
-                      style: GoogleFonts.quicksand(
-                        fontSize: 14,
-                        color: Colors.black54,
-                        letterSpacing: .5,
-                      ),
-                      // overflow: TextOverflow.ellipsis,
-                    ),
                     addVerticalSpace(20.0),
                     AnyLinkPreview(
-                      link: doc['event_link'],
+                      link: doc['ad_link'],
                       displayDirection: UIDirection.uiDirectionHorizontal,
                       showMultimedia: true,
                       bodyMaxLines: 5,
@@ -328,11 +251,11 @@ class _AdminApproveAdsPageState extends State<AdminApproveAdsPage> {
                         GestureDetector(
                           onTap: () {
                             DocumentReference ds = FirebaseFirestore.instance
-                                .collection('XEvents')
-                                .doc(doc['event_id']);
+                                .collection('XAds')
+                                .doc(doc['ad_id']);
 
                             Map<String, dynamic> tasks = {
-                              'event_visibility': false,
+                              'ad_visibility': false,
                             };
 
                             ds.update(tasks);
@@ -348,11 +271,11 @@ class _AdminApproveAdsPageState extends State<AdminApproveAdsPage> {
                         GestureDetector(
                           onTap: () {
                             DocumentReference ds = FirebaseFirestore.instance
-                                .collection('XEvents')
-                                .doc(doc['event_id']);
+                                .collection('XAds')
+                                .doc(doc['ad_id']);
 
                             Map<String, dynamic> tasks = {
-                              'event_visibility': true,
+                              'ad_visibility': true,
                             };
 
                             ds.update(tasks);

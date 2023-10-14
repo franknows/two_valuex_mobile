@@ -392,6 +392,33 @@ Widget simpleRoundedButton(String text) {
   );
 }
 
+Widget tealButton(String text) {
+  return Container(
+    height: 30.0,
+    width: double.infinity,
+    decoration: BoxDecoration(
+      borderRadius: BorderRadius.circular(20.0),
+      color: Colors.teal.withOpacity(.2),
+      border: Border.all(
+        color: Colors.teal.withOpacity(.2),
+        width: 0.5,
+      ),
+    ),
+    child: Center(
+      child: Text(
+        text,
+        style: GoogleFonts.quicksand(
+          color: Colors.teal,
+          // fontWeight: FontWeight.bold,
+          fontSize: 12,
+          letterSpacing: .5,
+        ),
+        textAlign: TextAlign.center,
+      ),
+    ),
+  );
+}
+
 Widget simpleDarkRoundedButton(String text) {
   return Container(
     height: 40.0,
@@ -2538,33 +2565,6 @@ adAdminApproveItem(DocumentSnapshot doc, String userId) {
           children: [
             addVerticalSpace(10),
             Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Flexible(
-                  child: Text(
-                    doc['event_title'],
-                    style: GoogleFonts.quicksand(
-                      textStyle: const TextStyle(
-                        fontSize: 14.0,
-                        color: Colors.black87,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                    maxLines: 2,
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                ),
-                addHorizontalSpace(20),
-                Icon(
-                  doc['event_interested_users'].contains(userId)
-                      ? CupertinoIcons.star
-                      : CupertinoIcons.star_fill,
-                  color: Colors.grey,
-                )
-              ],
-            ),
-            addVerticalSpace(10),
-            Row(
               children: [
                 SizedBox(
                   height: 90,
@@ -2573,20 +2573,17 @@ adAdminApproveItem(DocumentSnapshot doc, String userId) {
                     borderRadius: BorderRadius.circular(10.0),
                     child: AspectRatio(
                       aspectRatio: 1 / 1,
-                      child: Hero(
-                        tag: 'eventHero${doc['event_id']}',
-                        child: CachedNetworkImage(
-                          imageUrl: doc['event_image'],
-                          placeholder: (context, url) => Image.asset(
-                            'assets/images/vertical_placeholder.png',
-                            fit: BoxFit.cover,
-                          ),
-                          errorWidget: (context, url, error) => Image.asset(
-                            'assets/images/vertical_placeholder.png',
-                            fit: BoxFit.cover,
-                          ),
+                      child: CachedNetworkImage(
+                        imageUrl: doc['ad_image'],
+                        placeholder: (context, url) => Image.asset(
+                          'assets/images/vertical_placeholder.png',
                           fit: BoxFit.cover,
                         ),
+                        errorWidget: (context, url, error) => Image.asset(
+                          'assets/images/vertical_placeholder.png',
+                          fit: BoxFit.cover,
+                        ),
+                        fit: BoxFit.cover,
                       ),
                     ),
                   ),
@@ -2598,11 +2595,11 @@ adAdminApproveItem(DocumentSnapshot doc, String userId) {
                     mainAxisAlignment: MainAxisAlignment.start,
                     children: [
                       Text(
-                        doc['event_date'] == null
+                        doc['ad_posted_time'] == null
                             ? '-'
                             : DateFormat('dd MMM, yyyy').format(
                                 DateTime.parse(
-                                  doc['event_date'].toDate().toString(),
+                                  doc['ad_posted_time'].toDate().toString(),
                                 ),
                               ),
                         style: GoogleFonts.quicksand(
@@ -2613,7 +2610,7 @@ adAdminApproveItem(DocumentSnapshot doc, String userId) {
                         ),
                       ),
                       Text(
-                        doc['event_description'],
+                        doc['ad_description'],
                         style: GoogleFonts.quicksand(
                           fontSize: 14,
                           color: Colors.black54,

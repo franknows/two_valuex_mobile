@@ -478,18 +478,22 @@ class _AdminProfilePageState extends State<AdminProfilePage> {
                     const SizedBox(
                       height: 40,
                     ),
-                    Center(
-                      child: InkWell(
-                        onTap: () {
-                          openLogoutDialog(widget.userData['user_language']);
-                        },
-                        child: Padding(
-                          padding: const EdgeInsets.symmetric(
-                              horizontal: 16.0, vertical: 6.0),
-                          child: blackBoldText(
-                              language == 'ro' ? 'Deconectați-vă' : 'Log out'),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        SizedBox(
+                          width: 200,
+                          child: GestureDetector(
+                            onTap: () {
+                              openLogoutDialog(
+                                  widget.userData['user_language']);
+                            },
+                            child: tealButton(
+                              language == 'ro' ? 'Deconectați-vă' : 'Log Out',
+                            ),
+                          ),
                         ),
-                      ),
+                      ],
                     ),
                     addVerticalSpace(90),
                     // Row(
