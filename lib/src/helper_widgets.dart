@@ -419,6 +419,33 @@ Widget simpleDarkRoundedButton(String text) {
   );
 }
 
+Widget simpleErrorDarkRoundedButton(String text) {
+  return Container(
+    height: 40.0,
+    width: double.infinity,
+    decoration: BoxDecoration(
+      borderRadius: BorderRadius.circular(20.0),
+      color: TAppTheme.errorColor,
+      border: Border.all(
+        color: TAppTheme.errorColor,
+        width: 1.5,
+      ),
+    ),
+    child: Center(
+      child: Text(
+        text,
+        style: GoogleFonts.quicksand(
+          color: Colors.white,
+          fontWeight: FontWeight.bold,
+          fontSize: 18,
+          letterSpacing: .5,
+        ),
+        textAlign: TextAlign.center,
+      ),
+    ),
+  );
+}
+
 Widget nextButton(String text) {
   return Container(
     height: 40.0,
@@ -2384,6 +2411,230 @@ eventPublicItem(DocumentSnapshot doc, String userId) {
   );
 }
 
+eventAdminApproveItem(DocumentSnapshot doc, String userId) {
+  return Padding(
+    padding: const EdgeInsets.only(bottom: 12.0),
+    child: Container(
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(10.0),
+        color: Colors.white,
+      ),
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 16.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            addVerticalSpace(10),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Flexible(
+                  child: Text(
+                    doc['event_title'],
+                    style: GoogleFonts.quicksand(
+                      textStyle: const TextStyle(
+                        fontSize: 14.0,
+                        color: Colors.black87,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ),
+                addHorizontalSpace(20),
+                Icon(
+                  doc['event_interested_users'].contains(userId)
+                      ? CupertinoIcons.star
+                      : CupertinoIcons.star_fill,
+                  color: Colors.grey,
+                )
+              ],
+            ),
+            addVerticalSpace(10),
+            Row(
+              children: [
+                SizedBox(
+                  height: 90,
+                  width: 90,
+                  child: ClipRRect(
+                    borderRadius: BorderRadius.circular(10.0),
+                    child: AspectRatio(
+                      aspectRatio: 1 / 1,
+                      child: Hero(
+                        tag: 'eventHero${doc['event_id']}',
+                        child: CachedNetworkImage(
+                          imageUrl: doc['event_image'],
+                          placeholder: (context, url) => Image.asset(
+                            'assets/images/vertical_placeholder.png',
+                            fit: BoxFit.cover,
+                          ),
+                          errorWidget: (context, url, error) => Image.asset(
+                            'assets/images/vertical_placeholder.png',
+                            fit: BoxFit.cover,
+                          ),
+                          fit: BoxFit.cover,
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+                addHorizontalSpace(10),
+                Flexible(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    children: [
+                      Text(
+                        doc['event_date'] == null
+                            ? '-'
+                            : DateFormat('dd MMM, yyyy').format(
+                                DateTime.parse(
+                                  doc['event_date'].toDate().toString(),
+                                ),
+                              ),
+                        style: GoogleFonts.quicksand(
+                          textStyle: const TextStyle(
+                            fontSize: 12.0,
+                            color: Colors.pink,
+                          ),
+                        ),
+                      ),
+                      Text(
+                        doc['event_description'],
+                        style: GoogleFonts.quicksand(
+                          fontSize: 14,
+                          color: Colors.black54,
+                          letterSpacing: .5,
+                        ),
+                        maxLines: 4,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ],
+                  ),
+                )
+              ],
+            ),
+            addVerticalSpace(30.0),
+          ],
+        ),
+      ),
+    ),
+  );
+}
+
+adAdminApproveItem(DocumentSnapshot doc, String userId) {
+  return Padding(
+    padding: const EdgeInsets.only(bottom: 12.0),
+    child: Container(
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(10.0),
+        color: Colors.white,
+      ),
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 16.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            addVerticalSpace(10),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Flexible(
+                  child: Text(
+                    doc['event_title'],
+                    style: GoogleFonts.quicksand(
+                      textStyle: const TextStyle(
+                        fontSize: 14.0,
+                        color: Colors.black87,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ),
+                addHorizontalSpace(20),
+                Icon(
+                  doc['event_interested_users'].contains(userId)
+                      ? CupertinoIcons.star
+                      : CupertinoIcons.star_fill,
+                  color: Colors.grey,
+                )
+              ],
+            ),
+            addVerticalSpace(10),
+            Row(
+              children: [
+                SizedBox(
+                  height: 90,
+                  width: 90,
+                  child: ClipRRect(
+                    borderRadius: BorderRadius.circular(10.0),
+                    child: AspectRatio(
+                      aspectRatio: 1 / 1,
+                      child: Hero(
+                        tag: 'eventHero${doc['event_id']}',
+                        child: CachedNetworkImage(
+                          imageUrl: doc['event_image'],
+                          placeholder: (context, url) => Image.asset(
+                            'assets/images/vertical_placeholder.png',
+                            fit: BoxFit.cover,
+                          ),
+                          errorWidget: (context, url, error) => Image.asset(
+                            'assets/images/vertical_placeholder.png',
+                            fit: BoxFit.cover,
+                          ),
+                          fit: BoxFit.cover,
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+                addHorizontalSpace(10),
+                Flexible(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    children: [
+                      Text(
+                        doc['event_date'] == null
+                            ? '-'
+                            : DateFormat('dd MMM, yyyy').format(
+                                DateTime.parse(
+                                  doc['event_date'].toDate().toString(),
+                                ),
+                              ),
+                        style: GoogleFonts.quicksand(
+                          textStyle: const TextStyle(
+                            fontSize: 12.0,
+                            color: Colors.pink,
+                          ),
+                        ),
+                      ),
+                      Text(
+                        doc['event_description'],
+                        style: GoogleFonts.quicksand(
+                          fontSize: 14,
+                          color: Colors.black54,
+                          letterSpacing: .5,
+                        ),
+                        maxLines: 4,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ],
+                  ),
+                )
+              ],
+            ),
+            addVerticalSpace(30.0),
+          ],
+        ),
+      ),
+    ),
+  );
+}
+
 String capitalize(String text) {
   if (text.isEmpty) {
     return text;
@@ -2589,10 +2840,11 @@ class Indicator extends StatelessWidget {
         ),
         Text(
           text,
-          style: TextStyle(
-            fontSize: 16,
-            fontWeight: FontWeight.bold,
+          style: GoogleFonts.quicksand(
             color: textColor,
+            // fontWeight: FontWeight.bold,
+            fontSize: 16,
+            letterSpacing: .5,
           ),
         )
       ],

@@ -18,12 +18,75 @@ class _AdminAnalyticsViewState extends State<AdminAnalyticsView> {
   int touchedIndex = -1;
   String language = '';
 
+  int contentCount = 1;
+  int pressesCount = 1;
+  int interviewsCount = 1;
+  int jobsCount = 1;
+  int eventsCount = 1;
+
   @override
   void initState() {
-    // TODO: implement initState
     super.initState();
     setState(() {
       language = widget.userData['user_language'];
+    });
+    getPressesCount();
+    getInterviewsCount();
+    getJobsCount();
+    getEventsCount();
+    getTotal();
+  }
+
+  getPressesCount() async {
+    QuerySnapshot snapshot = await FirebaseFirestore.instance
+        .collection('XArticles')
+        .doc('Presses')
+        .collection('Dominant')
+        .where('press_status', isEqualTo: '-')
+        .get();
+
+    setState(() {
+      pressesCount = snapshot.docs.length;
+    });
+    getTotal();
+  }
+
+  getInterviewsCount() async {
+    QuerySnapshot snapshot = await FirebaseFirestore.instance
+        .collection('XArticles')
+        .doc('Interviews')
+        .collection('Dominant')
+        .get();
+
+    setState(() {
+      interviewsCount = snapshot.docs.length;
+    });
+    getTotal();
+  }
+
+  getJobsCount() async {
+    QuerySnapshot snapshot =
+        await FirebaseFirestore.instance.collection('XJobs').get();
+
+    setState(() {
+      jobsCount = snapshot.docs.length;
+    });
+    getTotal();
+  }
+
+  getEventsCount() async {
+    QuerySnapshot snapshot =
+        await FirebaseFirestore.instance.collection('XEvents').get();
+
+    setState(() {
+      eventsCount = snapshot.docs.length;
+    });
+    getTotal();
+  }
+
+  getTotal() {
+    setState(() {
+      contentCount = pressesCount + interviewsCount + jobsCount + eventsCount;
     });
   }
 
@@ -75,7 +138,7 @@ class _AdminAnalyticsViewState extends State<AdminAnalyticsView> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Indicator(
-                        color: Colors.blueGrey,
+                        color: const Color(0xff7C81AD),
                         text: language == 'ro'
                             ? 'Comunicate de presă'
                             : 'Press releases',
@@ -83,7 +146,7 @@ class _AdminAnalyticsViewState extends State<AdminAnalyticsView> {
                       ),
                       addVerticalSpace(8.0),
                       Indicator(
-                        color: Colors.yellow,
+                        color: const Color(0xff9EB384),
                         text: language == 'ro' ? 'Interviuri' : 'Interviews',
                         isSquare: false,
                       ),
@@ -93,14 +156,14 @@ class _AdminAnalyticsViewState extends State<AdminAnalyticsView> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Indicator(
-                        color: Colors.purple,
-                        text: language == 'ro' ? 'Companii' : 'Companies',
+                        color: const Color(0xff78D6C6),
+                        text: language == 'ro' ? 'Locuri de munca' : 'Jobs',
                         isSquare: false,
                       ),
                       addVerticalSpace(8.0),
                       Indicator(
-                        color: Colors.green,
-                        text: language == 'ro' ? 'Jurnaliştii' : 'Journalists',
+                        color: const Color(0xffF4D160),
+                        text: language == 'ro' ? 'Evenimente' : 'Events',
                         isSquare: false,
                       ),
                     ],
@@ -125,9 +188,9 @@ class _AdminAnalyticsViewState extends State<AdminAnalyticsView> {
       switch (i) {
         case 0:
           return PieChartSectionData(
-            color: Colors.blueGrey,
-            value: 40,
-            title: '40%',
+            color: const Color(0xff7C81AD),
+            value: pressesCount.toDouble(),
+            title: "${((pressesCount / contentCount) * 100).toInt()}%",
             radius: radius,
             titleStyle: TextStyle(
               fontSize: fontSize,
@@ -138,9 +201,9 @@ class _AdminAnalyticsViewState extends State<AdminAnalyticsView> {
           );
         case 1:
           return PieChartSectionData(
-            color: Colors.yellow,
-            value: 30,
-            title: '30%',
+            color: const Color(0xff9EB384),
+            value: interviewsCount.toDouble(),
+            title: "${((interviewsCount / contentCount) * 100).toInt()}%",
             radius: radius,
             titleStyle: TextStyle(
               fontSize: fontSize,
@@ -151,9 +214,9 @@ class _AdminAnalyticsViewState extends State<AdminAnalyticsView> {
           );
         case 2:
           return PieChartSectionData(
-            color: Colors.purple,
-            value: 15,
-            title: '15%',
+            color: const Color(0xff78D6C6),
+            value: jobsCount.toDouble(),
+            title: "${((jobsCount / contentCount) * 100).toInt()}%",
             radius: radius,
             titleStyle: TextStyle(
               fontSize: fontSize,
@@ -164,9 +227,9 @@ class _AdminAnalyticsViewState extends State<AdminAnalyticsView> {
           );
         case 3:
           return PieChartSectionData(
-            color: Colors.green,
-            value: 15,
-            title: '15%',
+            color: const Color(0xffF4D160),
+            value: jobsCount.toDouble(),
+            title: "${((jobsCount / contentCount) * 100).toInt()}%",
             radius: radius,
             titleStyle: TextStyle(
               fontSize: fontSize,

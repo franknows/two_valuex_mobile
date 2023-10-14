@@ -142,21 +142,21 @@ class _AdminHomePageState extends State<AdminHomePage> {
                       ],
                     ),
                   ),
-                  PopupMenuItem<String>(
-                    value: '1',
-                    child: Row(
-                      children: [
-                        const Icon(
-                          Icons.wallet,
-                          color: Colors.black87,
-                          size: 20,
-                        ),
-                        addHorizontalSpace(10),
-                        blackBoldTextWithSize(
-                            language == 'ro' ? 'Portofel' : 'Wallet', 16),
-                      ],
-                    ),
-                  ),
+                  // PopupMenuItem<String>(
+                  //   value: '1',
+                  //   child: Row(
+                  //     children: [
+                  //       const Icon(
+                  //         Icons.wallet,
+                  //         color: Colors.black87,
+                  //         size: 20,
+                  //       ),
+                  //       addHorizontalSpace(10),
+                  //       blackBoldTextWithSize(
+                  //           language == 'ro' ? 'Portofel' : 'Wallet', 16),
+                  //     ],
+                  //   ),
+                  // ),
                 ],
               ),
             ],

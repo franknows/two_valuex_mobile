@@ -19,6 +19,7 @@ class AdminPurchasesView extends StatefulWidget {
 class _AdminPurchasesViewState extends State<AdminPurchasesView> {
   final Duration animDuration = const Duration(milliseconds: 250);
 
+  String language = '';
   int touchedIndex = -1;
 
   ///Data
@@ -33,6 +34,9 @@ class _AdminPurchasesViewState extends State<AdminPurchasesView> {
   @override
   void initState() {
     super.initState();
+    setState(() {
+      language = widget.userData['user_language'];
+    });
     _getNumberOfCompanies();
     _getDemoAccounts();
     _getPremiumAccounts();
@@ -80,7 +84,7 @@ class _AdminPurchasesViewState extends State<AdminPurchasesView> {
     QuerySnapshot snapshot = await FirebaseFirestore.instance
         .collection('XUsers')
         .where('account_type', isEqualTo: 'Company')
-        .where('user_plan', isNotEqualTo: 'BE A PUBLISHER')
+        .where('user_plan', isEqualTo: 'BE A PUBLISHER')
         .get();
 
     setState(() {
@@ -92,7 +96,7 @@ class _AdminPurchasesViewState extends State<AdminPurchasesView> {
     QuerySnapshot snapshot = await FirebaseFirestore.instance
         .collection('XUsers')
         .where('account_type', isEqualTo: 'Company')
-        .where('user_plan', isNotEqualTo: 'PROMOTE YOUR MESSAGE')
+        .where('user_plan', isEqualTo: 'PROMOTE YOUR MESSAGE')
         .get();
 
     setState(() {
@@ -104,7 +108,7 @@ class _AdminPurchasesViewState extends State<AdminPurchasesView> {
     QuerySnapshot snapshot = await FirebaseFirestore.instance
         .collection('XUsers')
         .where('account_type', isEqualTo: 'Company')
-        .where('user_plan', isNotEqualTo: 'GET THE BRAND')
+        .where('user_plan', isEqualTo: 'GET THE BRAND')
         .get();
 
     setState(() {
@@ -123,10 +127,15 @@ class _AdminPurchasesViewState extends State<AdminPurchasesView> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: <Widget>[
-                blueGreyBoldTextWithSize('Companies', 24),
+                blueGreyBoldTextWithSize(
+                  language == 'ro' ? 'Companii' : 'Companies',
+                  24,
+                ),
                 addVerticalSpace(4),
                 blueGreyNormalTextWithSize(
-                  'Subscriptions denomination',
+                  language == 'ro'
+                      ? 'Denumirea abonamentelor'
+                      : 'Subscriptions denomination',
                   14,
                 ),
                 addVerticalSpace(38),
@@ -184,19 +193,25 @@ class _AdminPurchasesViewState extends State<AdminPurchasesView> {
   List<BarChartGroupData> showingGroups() => List.generate(7, (i) {
         switch (i) {
           case 0:
-            return makeGroupData(0, 19, isTouched: i == touchedIndex);
+            return makeGroupData(0, companiesCount.toDouble(),
+                isTouched: i == touchedIndex);
           case 1:
-            return makeGroupData(1, 6.5, isTouched: i == touchedIndex);
+            return makeGroupData(1, demoAccounts.toDouble(),
+                isTouched: i == touchedIndex);
           case 2:
-            return makeGroupData(2, 5, isTouched: i == touchedIndex);
+            return makeGroupData(2, premiumAccounts.toDouble(),
+                isTouched: i == touchedIndex);
           case 3:
-            return makeGroupData(3, 7.5, isTouched: i == touchedIndex);
+            return makeGroupData(3, bapAccounts.toDouble(),
+                isTouched: i == touchedIndex);
           case 4:
-            return makeGroupData(4, 9, isTouched: i == touchedIndex);
+            return makeGroupData(4, pymAccounts.toDouble(),
+                isTouched: i == touchedIndex);
           case 5:
-            return makeGroupData(5, 11.5, isTouched: i == touchedIndex);
+            return makeGroupData(5, gtbAccounts.toDouble(),
+                isTouched: i == touchedIndex);
           case 6:
-            return makeGroupData(6, 6.5, isTouched: i == touchedIndex);
+            return makeGroupData(6, 6, isTouched: i == touchedIndex);
           default:
             return throw Error();
         }
@@ -208,7 +223,7 @@ class _AdminPurchasesViewState extends State<AdminPurchasesView> {
         touchTooltipData: BarTouchTooltipData(
           tooltipBgColor: Colors.blueGrey,
           tooltipHorizontalAlignment: FLHorizontalAlignment.center,
-          tooltipMargin: -10,
+          tooltipMargin: 20,
           getTooltipItem: (group, groupIndex, rod, rodIndex) {
             String weekDay;
             switch (group.x) {

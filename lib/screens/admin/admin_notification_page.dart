@@ -28,6 +28,12 @@ class _AdminNotificationsPageState extends State<AdminNotificationsPage> {
     setState(() {
       language = widget.myUserInfo['user_language'];
     });
+    DocumentReference ds =
+        FirebaseFirestore.instance.collection('XUsers').doc(widget.userId);
+    Map<String, dynamic> tasks = {
+      'notification_count': 0,
+    };
+    ds.update(tasks);
   }
 
   @override
